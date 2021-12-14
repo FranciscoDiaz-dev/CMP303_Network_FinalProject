@@ -52,7 +52,7 @@ void GameStateManager::switchTo(const GState& gState)
 
 // Basic game function for calling to the handle input function of the current game state
 // this current game state to handle will be always in the last position of the state container
-void GameStateManager::handleInput(float dt)
+void GameStateManager::handleInput(sf::Time dt)
 {
 	if (stateContainer.empty()) { return; } // check if there are any game state ocject created in the container
 
@@ -61,7 +61,7 @@ void GameStateManager::handleInput(float dt)
 
 // Basic game function for calling to the update function of the current game state
 // this current game state to update will be always in the last position of the state container
-void GameStateManager::update(float dt)
+void GameStateManager::update(sf::Time dt)
 {
 	if (stateContainer.empty()) { return; } // check if there are any game state ocject created in the container
 

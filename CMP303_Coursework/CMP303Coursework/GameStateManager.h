@@ -48,8 +48,8 @@ public:
 
 	// Basic game function for calling to the update, handle and render function of the current game state
 	// this current game state will be always in the last position of the state container
-	void handleInput(float dt);
-	void update(float dt);
+	void handleInput(sf::Time dt);
+	void update(sf::Time dt);
 	void render();
 
 	// Function to get the Shared Context used in the game states

@@ -15,13 +15,21 @@
 #include "NetworkSimulator.h"
 #include <Windows.h> // for get the local time
 
+#include "SharedContext.h"
+#include "GUI.h"
+
+
 // Control of window events
-void windowProcess(sf::RenderWindow* window, Input* in, const unsigned int& MIN_WIDTH, const unsigned int& MIN_HEIGHT)
+void windowProcess(sf::RenderWindow* window, Input* in, GUI* gui, const unsigned int& MIN_WIDTH, const unsigned int& MIN_HEIGHT)
 {
 	// Handle window events.
 	sf::Event event;
 	while (window->pollEvent(event))
 	{
+		// process event for the gui
+		gui->processEvent(event);
+
+		// process windows event
 		switch (event.type)
 		{
 		case sf::Event::Closed:
@@ -89,6 +97,9 @@ int main()
 	const unsigned int kMinWindowHeight = 480;
 	sf::RenderWindow window(sf::VideoMode(kMinWindowWith, kMinWindowHeight), kGameName);
 	window.setFramerateLimit(60);	//Request 60 frames per second
+
+	GUI gui(&window);
+
 	Input input; // imput component used in all the game
 	GameState gameState; // game state component which contains the current game state
 
@@ -107,6 +118,7 @@ int main()
 	sharedContext.input = &input;
 	sharedContext.netSimulator = &netSimulator;
 	sharedContext.gameState = &gameState;
+	sharedContext.gui = &gui;
 
 	// Initilise GameStateManager 
 	GameStateManager gameStateManager(&sharedContext);
@@ -116,20 +128,24 @@ int main()
 
 	// Initialise objects for delta time
 	sf::Clock gameClock;
-	float deltaTime;
+	sf::Time deltaTime;
+
+	char windowTitle[255] = "ImGui + SFML = <3";
+	sf::Color bgColor;
+	float color[3] = { 0.f, 0.f, 0.f };
 
 	// Game Loop
 	while (sharedContext.window->isOpen())
 	{
 		//Process window events
-		windowProcess(sharedContext.window, sharedContext.input, kMinWindowWith, kMinWindowHeight);
+		windowProcess(sharedContext.window, sharedContext.input, sharedContext.gui, kMinWindowWith, kMinWindowHeight);
 
 		// Calculate delta time. How much time has passed 
 		// since it was last calculated (in seconds) and restart the clock->
-		deltaTime = gameClock.restart().asSeconds();
-
+		deltaTime = gameClock.restart();
+		
 		// Call standard game loop functions (input, update and render)
-		gameStateManager.handleInput(deltaTime);
+		gameStateManager.handleInput(deltaTime);	
 		gameStateManager.update(deltaTime);
 		gameStateManager.render();
 

@@ -3,6 +3,7 @@
 #include <vector>
 #include "TankMessage.h"
 
+
 class Tank : public sf::Sprite
 {
 public:

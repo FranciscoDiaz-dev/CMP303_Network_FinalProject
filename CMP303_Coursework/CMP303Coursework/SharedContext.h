@@ -22,10 +22,10 @@
 // All the components that are shared between the game states
 // They must been initialise in the Game App or any of the mains
 
-
 class Input;
 class NetworkSimulator;
 class GameState;
+class GUI;
 namespace sf
 {
 	class String;
@@ -46,6 +46,7 @@ struct SharedContext
 	Input* input; // imput component
 	NetworkSimulator* netSimulator;
 	GameState* gameState; // game state component which contains the current game state
+	GUI* gui;
 };
 
 #endif // _SHARED_CONTEXT_H

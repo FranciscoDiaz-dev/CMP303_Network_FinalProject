@@ -25,6 +25,8 @@ GameState_Level::GameState_Level(GameStateManager* stateMgr) : GameStateBase(sta
 	debugText.setFont(montserratFont);
 	debugText.setOutlineColor(sf::Color::Black);
 	debugText.setOutlineThickness(1.f);
+
+	gui = gameStateManager->getSharedContext()->gui;
 }
 
 GameState_Level::~GameState_Level()
@@ -36,9 +38,8 @@ GameState_Level::~GameState_Level()
 	}
 }
 
-void GameState_Level::handleInput(float dt)
+void GameState_Level::handleInput(sf::Time dt)
 {
-
 	// check if the user want to pause the game
 	if (input->isKeyDown(sf::Keyboard::R))
 	{
@@ -52,13 +53,16 @@ void GameState_Level::handleInput(float dt)
 		netSimulator->Reset();
 		printf("\n\n--------RESET--------\n\n");
 	}
-	
 }
 
-void GameState_Level::update(float dt)
+void GameState_Level::update(sf::Time dt)
 {
+
 	// Update text
 	debugText.setString("Game Time: " + Utils::stringify(netSimulator->Time()));
+
+	// update gui
+	gui->update(dt);
 
 	//If we're at the start, just advance the time by 3.5 seconds, so we have a few packets in the queue already
 	if (netSimulator->Time() < 1.0f) {
@@ -70,7 +74,7 @@ void GameState_Level::update(float dt)
 		TankMessage msg;
 
 		//Update the network simulation
-		netSimulator->Update(dt);
+		netSimulator->Update(dt.asSeconds());
 		//Get any 'network' messages that are available
 		while (netSimulator->ReceiveMessage(msg)) {
 			printf("Received message: ID= %d, Pos = (%.2f, %.2f), Time =%.2f\n", msg.id, msg.x, msg.y, msg.time);
@@ -83,7 +87,7 @@ void GameState_Level::update(float dt)
 		//Update the tanks
 		for (int i = 0; i < (int)tanks.size(); i++)
 		{
-			tanks.at(i)->Update(dt);	//Update the real position of the tank with the info from the latest packet
+			tanks.at(i)->Update(dt.asSeconds());	//Update the real position of the tank with the info from the latest packet
 
 			if (i != netSimulator->m_MyID)
 			{
@@ -118,8 +122,20 @@ void GameState_Level::render()
 
 		// Render the text
 		window->draw(debugText);
+
+		gui->render();
 	
 	endDraw();
+}
+
+void GameState_Level::renderGUI()
+{
+	/*ImGui::Begin("Hello, world!");
+	ImGui::Button("Look at this pretty button");
+	ImGui::End();
+
+	ImGui::SFML::Render(*window);
+	*/
 }
 
 void GameState_Level::goToGameOver()

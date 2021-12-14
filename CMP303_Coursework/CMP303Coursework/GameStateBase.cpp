@@ -1,5 +1,6 @@
 #include "GameStateBase.h"
 
+
 // We include the Game State Manager here to avoid the recursive definitions and be available to use the getSharedContext()
 #include "GameStateManager.h"  // this "include" needs to be included in each class that extend from GameStateBase (in the.h)
 
@@ -16,17 +17,21 @@ GameStateBase::~GameStateBase()
 }
 
 // override this function to provide functionality
-void GameStateBase::handleInput(float dt)
+void GameStateBase::handleInput(sf::Time dt)
 {
 }
 
 // override this function to provide functionality
-void GameStateBase::update(float dt)
+void GameStateBase::update(sf::Time dt)
 {
 }
 
 // override this function to provide functionality
 void GameStateBase::render()
+{
+}
+
+void GameStateBase::renderGUI()
 {
 }
 

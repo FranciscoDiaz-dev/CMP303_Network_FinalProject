@@ -25,6 +25,7 @@
     <ClCompile Include="GameStateBase.cpp" />
     <ClCompile Include="GameStateManager.cpp" />
     <ClCompile Include="GameState_Level.cpp" />
+    <ClCompile Include="GUI.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NetworkSimulator.cpp" />
     <ClCompile Include="SharedContext.cpp" />
@@ -38,6 +39,7 @@
     <ClInclude Include="GameStateBase.h" />
     <ClInclude Include="GameStateManager.h" />
     <ClInclude Include="GameState_Level.h" />
+    <ClInclude Include="GUI.h" />
     <ClInclude Include="NetworkSimulator.h" />
     <ClInclude Include="SharedContext.h" />
     <ClInclude Include="Tank.h" />
@@ -115,7 +117,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>SFML_STATIC; WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)SFML-2.5.1-32bit\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)SFML-2.5.1-32bit\include;$(ProjectDir)ImGUI-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -147,7 +149,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>SFML_STATIC;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)SFML-2.5.1-32bit\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)SFML-2.5.1-32bit\include;$(ProjectDir)ImGUI-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
