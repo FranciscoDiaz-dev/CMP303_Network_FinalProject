@@ -1,10 +1,7 @@
 #include "GUI.h"
 
-#include "ImGUI\imgui.cpp"
-#include "ImGUI\imgui_widgets.cpp"
-#include "ImGUI\imgui_draw.cpp"
-#include "ImGUI\imgui_tables.cpp"
-#include "ImGUI-SFML\imgui-SFML.cpp"
+#include "ImGUI\imgui.h"
+#include "ImGUI-SFML\imgui-SFML.h"
 
 GUI::GUI(sf::RenderWindow* wnd) :
 	isActivated(false),

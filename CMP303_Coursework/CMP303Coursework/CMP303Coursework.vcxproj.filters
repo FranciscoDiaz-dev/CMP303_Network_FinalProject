@@ -16,6 +16,9 @@
     <Filter Include="Framework">
       <UniqueIdentifier>{0c7fbfc4-7936-4493-a891-686095e65b36}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI">
+      <UniqueIdentifier>{2a750469-b408-4c7c-a717-9ade1138d5b5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -53,6 +56,24 @@
     </ClCompile>
     <ClCompile Include="GUI.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI-master\ImGUI-SFML\imgui-SFML.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI-master\ImGUI\imgui.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI-master\ImGUI\imgui_demo.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI-master\ImGUI\imgui_draw.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI-master\ImGUI\imgui_tables.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI-master\ImGUI\imgui_widgets.cpp">
+      <Filter>GUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

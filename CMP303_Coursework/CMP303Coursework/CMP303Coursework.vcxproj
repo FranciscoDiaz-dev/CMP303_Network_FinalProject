@@ -26,6 +26,12 @@
     <ClCompile Include="GameStateManager.cpp" />
     <ClCompile Include="GameState_Level.cpp" />
     <ClCompile Include="GUI.cpp" />
+    <ClCompile Include="ImGUI-master\ImGUI-SFML\imgui-SFML.cpp" />
+    <ClCompile Include="ImGUI-master\ImGUI\imgui.cpp" />
+    <ClCompile Include="ImGUI-master\ImGUI\imgui_demo.cpp" />
+    <ClCompile Include="ImGUI-master\ImGUI\imgui_draw.cpp" />
+    <ClCompile Include="ImGUI-master\ImGUI\imgui_tables.cpp" />
+    <ClCompile Include="ImGUI-master\ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NetworkSimulator.cpp" />
     <ClCompile Include="SharedContext.cpp" />
