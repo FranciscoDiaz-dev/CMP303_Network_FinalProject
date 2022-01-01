@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Framework">
+      <UniqueIdentifier>{0c7fbfc4-7936-4493-a891-686095e65b36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ImGUI-master">
+      <UniqueIdentifier>{2a750469-b408-4c7c-a717-9ade1138d5b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ImGUI-master\ImGUI-SFML">
+      <UniqueIdentifier>{8c0df966-0cb9-484d-8495-f71060f3f119}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ImGUI-master\ImGUI">
+      <UniqueIdentifier>{6281ea50-e8b6-4fe4-9394-271d7d4f5b6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ImGUI-master\ImGUI\misc">
+      <UniqueIdentifier>{76788a74-570f-4023-857a-65d7553e33cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ImGUI-master\ImGUI\misc\cpp">
+      <UniqueIdentifier>{964affa4-44cd-48ce-a4f0-9b33c422df74}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Tank.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\Input.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\Vector.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI-master\ImGUI-SFML\imgui-SFML.cpp">
+      <Filter>ImGUI-master\ImGUI-SFML</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI-master\ImGUI\imgui.cpp">
+      <Filter>ImGUI-master\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI-master\ImGUI\imgui_demo.cpp">
+      <Filter>ImGUI-master\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI-master\ImGUI\imgui_draw.cpp">
+      <Filter>ImGUI-master\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI-master\ImGUI\imgui_tables.cpp">
+      <Filter>ImGUI-master\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI-master\ImGUI\imgui_widgets.cpp">
+      <Filter>ImGUI-master\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ServersManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI-master\ImGUI\misc\cpp\imgui_stdlib.cpp">
+      <Filter>ImGUI-master\ImGUI\misc\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerConnection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectionBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Tank.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConnectionMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\Input.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\Vector.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI-master\ImGUI-SFML\imgui-SFML.h">
+      <Filter>ImGUI-master\ImGUI-SFML</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI-master\ImGUI\imgui.h">
+      <Filter>ImGUI-master\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="ServersManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerConnection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConnectionBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
