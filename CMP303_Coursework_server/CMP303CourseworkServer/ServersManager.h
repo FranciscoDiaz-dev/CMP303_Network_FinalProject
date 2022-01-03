@@ -6,24 +6,13 @@
 #include <string>
 #include <vector>
 
-#include "ServerConnection.h"
+#include "../../NetworkFramework/ServerConnection.h"
+#include "../../NetworkFramework/ServerInfo.h"
 
 using std::string; using std::map; using std::vector;
 
-
-struct ServerInfo
-{
-	// constructor
-	ServerInfo() : address(""), available(0) {};
-
-	// components
-	string address;
-	bool available;
-};
-
 class ServersManager
 {
-
 public:
 	// constructor
 	ServersManager();
@@ -35,28 +24,28 @@ public:
 	// return a list with all the servers
 	vector<string> getServersList();
 
-	// find the selected server name on the list and selected it if it is available
+	// find the server id on the list and selected it if it is available
 	// return if it has been found and it is available
-	bool setSelectedServer(string selectServerName);
-	bool createServerConnection();
-	string getSelectedServerName() const { return selectedServerName; };
-	ServerInfo getSelectedServerInfo() const { return selectedServerInfo; };
+	bool initialiseServerById(string serverId);
+	bool createServerConnection(ServerInfo& serverInfo);
+	string getActiveServerId() const;
+	ServerInfo getServerInfoById(string serverId) const;
+
+	// delete the server
+	void deleteServerConnection();
+
+	// run the active server
+	void runServer();
 
 private:
 	// Component where the data/info for each server is saved
 	map<string, ServerInfo> infoServers;
 
-	// save each server address into the map
+	// Save each server address into the map
 	void saveAddresses(const std::string& dataBasePath);
 
-	// delete the server
-	void deleteServerConnection();
-
-	// Server selected
-	string selectedServerName;
-	ServerInfo selectedServerInfo;
-
-	ServerConnection* serverConnection;
+	// Server
+	ServerConnection* activeServer;
 };
 
 #endif //_SERVERS_MANAGER_H

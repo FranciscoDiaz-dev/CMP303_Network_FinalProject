@@ -1,5 +1,6 @@
 #include "ServersManager.h"
 #include "Utils.h"
+#include "../../NetworkFramework/SockAddr.h"
 
 #include <sstream>
 
@@ -10,7 +11,7 @@ using std::getline;
 
 ServersManager::ServersManager()
 {
-    string dataBasePath = "DataBase/servers_addresses.csv";
+    string dataBasePath = "../../DataBase/servers_addresses.csv";
 
     saveAddresses(dataBasePath);
 }
@@ -18,8 +19,6 @@ ServersManager::ServersManager()
 ServersManager::~ServersManager()
 {
 }
-
-
 
 void ServersManager::saveAddresses(const std::string& dataBasePath)
 {
@@ -32,27 +31,39 @@ void ServersManager::saveAddresses(const std::string& dataBasePath)
     stringstream sstream(fileText);
 
     // varibles where to save server id and server address for each line/row
-    string sRow;
-    string serverAddress;
-    string serverID;
-    string serverAvailable;
+    string sRow; // full row
+    string serverID; // (short name)
+    string serverName; // (full name)
+    string serverAddress;  
+    string serverPort;
+
+    // for knowing what
+    int rowNum = 0;
 
     // split the text in rows
     while (getline(sstream, sRow))
     {
-        // convert the string row into string stream so we can split the columns
-        istringstream ssRow(sRow);
+        if (rowNum != 0) // skip the headings of the table
+        {
+            // convert the string row into string stream so we can split the columns
+            istringstream ssRow(sRow);
 
-        // Following the csv format the first column of a row would be the server id,
-        // the second column would be the server address and the third would be the number of users(clients) currently connected to that server
-        // using get line with the delimiter we get them
-        std::getline(ssRow, serverID, delimiter);
-        std::getline(ssRow, serverAddress, delimiter);
-        std::getline(ssRow, serverAvailable, delimiter);
+            // Following the csv format the first column of a row would be the server id,
+            // the second column would be the server address and the third would be the number of users(clients) currently connected to that server
+            // using get line with the delimiter we get them
+            std::getline(ssRow, serverID, delimiter);
+            std::getline(ssRow, serverName, delimiter);
+            std::getline(ssRow, serverAddress, delimiter);
+            std::getline(ssRow, serverPort, delimiter);
 
-        // save in the array the server address linked to the server id as a key
-        infoServers[serverID].address = serverAddress;
-        infoServers[serverID].available = stoi(serverAvailable);
+            // save in the array the server address linked to the server id as a key
+            infoServers[serverID].name = serverName;
+            infoServers[serverID].sockAddr.ipAddr = sf::IpAddress(serverAddress);
+            infoServers[serverID].sockAddr.port = stoi(serverPort);
+        }
+
+        // count the row
+        rowNum++;
     }
 }
 
@@ -67,18 +78,16 @@ std::vector<string> ServersManager::getServersList()
     return servers;
 }
 
-bool ServersManager::setSelectedServer(string selectServerName)
-{ 
-    // Find the server in the list
-    auto server = infoServers.find(selectedServerName);
-    if (server != infoServers.end() && server->second.available == true)
+
+ServerInfo ServersManager::getServerInfoById(string serverId) const
+{
+    auto server = infoServers.find(serverId);
+    if (server != infoServers.end())
     {
-        selectedServerName = selectServerName;
-        selectedServerInfo = server->second;
-        return true;
+        return server->second;
     }
     else
     {
-        return false;
+        return ServerInfo();
     }
 }

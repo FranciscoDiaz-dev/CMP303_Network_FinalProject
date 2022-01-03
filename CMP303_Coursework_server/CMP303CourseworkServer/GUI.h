@@ -4,7 +4,9 @@
 
 #include <vector>
 #include <string>
-#include <SFML/Graphics.hpp>
+#include <SFML\Graphics.hpp>
+
+#include "../../NetworkFramework/ServerInfo.h"
 
 class ServersManager;
 
@@ -29,19 +31,15 @@ public:
 	// render
 	void render();
 
-	// Activate ImGui
-	void active();
-	void deactive();
 
 private:
-	bool isActivated;
 	sf::RenderWindow* window;
 
 	ServersManager* serversManager;
 
 	// servers available
 	vector<string> servers;
-	int selectedServerIndex = 0;
+	int selectedServerIndex;
 };
 
 #endif //_GUI_H

@@ -6,6 +6,8 @@
 #include <string>
 #include <SFML/Graphics.hpp>
 
+#include "../../NetworkFramework/ServerInfo.h"
+
 class SharedContext;
 
 
@@ -41,7 +43,8 @@ private:
 
 	// servers available
 	vector<string> servers;
-	int selectedServerIndex = 0;
+	ServerInfo selectedServerInfo;
+	int selectedServerIndex;
 
 	// tank colours available
 	vector<string> tankColours;

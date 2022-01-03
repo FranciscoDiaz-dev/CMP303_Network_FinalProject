@@ -18,7 +18,7 @@ void Tank::Update(float dt)
 {
 	if (m_Messages.size() < 1)
 		return;
-	TankMessage latestMessage = m_Messages.back();
+	PlayerInfo latestMessage = m_Messages.back();
 	setPosition(latestMessage.x, latestMessage.y);
 }
 
@@ -64,7 +64,7 @@ const void Tank::Render(sf::RenderWindow* window) {
 	}
 }
 
-void Tank::AddMessage(const TankMessage& msg) {
+void Tank::AddMessage(const PlayerInfo& msg) {
 	m_Messages.push_back(msg);
 }
 
@@ -77,9 +77,9 @@ sf::Vector2f Tank::RunPrediction(float gameTime) {
 	if (msize < 3) {
 		return sf::Vector2f(predictedX, predictedX);
 	}
-	const TankMessage& msg0 = m_Messages[msize - 1];
-	const TankMessage& msg1 = m_Messages[msize - 2];
-	const TankMessage& msg2 = m_Messages[msize - 3];
+	const PlayerInfo& msg0 = m_Messages[msize - 1];
+	const PlayerInfo& msg1 = m_Messages[msize - 2];
+	const PlayerInfo& msg2 = m_Messages[msize - 3];
 
 	// FIXME: Implement prediction here!
 	// You have:

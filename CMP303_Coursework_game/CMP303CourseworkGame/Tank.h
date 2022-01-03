@@ -5,7 +5,7 @@
 #include <SFML\Graphics.hpp>
 #include <vector>
 #include <string>
-#include "ConnectionMessage.h"
+#include "../../NetworkFramework/ConnectionMessage.h"
 
 enum class RenderMode {
 	REAL_ONLY = 0,
@@ -26,7 +26,7 @@ public:
 	const void Render(sf::RenderWindow* window);
 
 	// Add a message to the tank's network message queue
-	void AddMessage(const TankMessage& msg);
+	void AddMessage(const PlayerInfo& msg);
 
 	// This method calculates and stores the position, but also returns it immediately for use in the main loop
 	// This is my where prediction would be... IF I HAD ANY
@@ -74,7 +74,7 @@ private:
 	RenderMode	m_RenderMode = RenderMode::REAL_ONLY;
 
 	// Component where we will be reading the player stats
-	std::vector<TankMessage> m_Messages;
+	std::vector<PlayerInfo> m_Messages;
 };
 
 #endif //_TANK_H

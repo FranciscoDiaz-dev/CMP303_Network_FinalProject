@@ -6,7 +6,6 @@
 #include "ImGUI\misc\cpp\imgui_stdlib.h"
 
 #include "ServersManager.h"
-#include "Tank.h"
 
 
 // Redefine callbackCombo and ListBox to use std::vector<std::string> instead arrays of const char
@@ -40,14 +39,17 @@ namespace ImGui
 
 
 GUI::GUI(sf::RenderWindow* wnd, ServersManager* serversMgr) :
-	isActivated(false),
 	window(wnd),
 	serversManager(serversMgr)
 {
+	// init GUI
 	ImGui::SFML::Init(*window);
 
 	// get the list of servers available
 	servers = serversManager->getServersList();
+
+	// initialise the default/selected data to show
+	selectedServerIndex = 0;
 }
 
 GUI::~GUI()
@@ -68,29 +70,33 @@ void GUI::update(sf::Time deltaTime)
 
 void GUI::render()
 {
-	ImGui::Begin("Game Settings"); // begin window
+	ImGui::Begin("Server Settings"); // begin window
+
+		//Title
+		ImGui::Text("Choose a server:");
+
+
+		ServerInfo selectedServerInfo = serversManager->getServerInfoById(servers.at(selectedServerIndex));
 
 		// Choosing Server
-		if (ImGui::Combo("Server", &selectedServerIndex, servers))
+		if (ImGui::Combo("Servers", &selectedServerIndex, servers))
 		{
-			if (servers.at(selectedServerIndex) != serversManager->getSelectedServerName())
-			{
-				serversManager->setSelectedServer(servers.at(selectedServerIndex));
-			}
+			//selectedServerInfo = serversManager->getServerInfoById(servers.at(selectedServerIndex));
+			serversManager->initialiseServerById(servers.at(selectedServerIndex));
 		}
+
+		// Server Details
+		if (selectedServerInfo.name != "")
+		{
+			ImGui::Text("\n");
+			ImGui::Text("*Server Details*");
+			ImGui::Text(string("Name: " + selectedServerInfo.name).c_str());
+			ImGui::Text(string("IP: " + selectedServerInfo.sockAddr.ipAddr.toString()).c_str());
+			ImGui::Text("Port: %d", selectedServerInfo.sockAddr.port);
+		}
+
 	ImGui::End(); // end window
 
 	// render the window
 	ImGui::SFML::Render(*window);
-}
-
-
-void GUI::active()
-{
-	isActivated = true;
-}
-
-void GUI::deactive()
-{
-	isActivated = false;
 }

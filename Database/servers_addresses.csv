@@ -1,0 +1,6 @@
+ID,Name,Address,Port
+EUW,Western Europe,127.0.0.1,4444
+EUNE,Northern Europe,127.0.0.2,4444
+NA,North America,127.0.0.3,4444
+LAN,Latin America,127.0.0.4,4444
+OCE,Oceania,127.0.0.5,4444

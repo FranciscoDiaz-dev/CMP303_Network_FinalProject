@@ -12,7 +12,6 @@
 #include <iostream>
 #include "Framework/Input.h"
 #include "ServersManager.h"
-#include "Tank.h"
 #include <Windows.h> // for get the local time
 
 #include "GUI.h"
@@ -126,6 +125,8 @@ int main()
 		window.clear(sf::Color(100, 149, 237));
 			gui.render();
 		window.display();
+
+		serversMgr.runServer();
 	}
 
 	return 0;

@@ -76,7 +76,7 @@ void GameState_Level::update(sf::Time dt)
 	}
 
 	if (netSimulator->Time() < 19.0f) {
-		TankMessage msg;
+		PlayerInfo msg;
 
 		//Update the network simulation
 		netSimulator->Update(dt.asSeconds());

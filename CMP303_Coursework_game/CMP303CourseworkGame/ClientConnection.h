@@ -2,11 +2,11 @@
 #define _CLIENT_CONNECTION_H
 #pragma once
 
-#include "ConnectionBase.h"
+#include "../../NetworkFramework/ConnectionBase.h"
+#include "../../NetworkFramework/ConnectionMessage.h"
 
 class ClientConnection : public ConnectionBase
 {
-
 public:
 	// constructor
 	ClientConnection();
@@ -14,7 +14,7 @@ public:
 	~ClientConnection();
 
 	// run the conexion to a server
-	void run(TankMessage tank_msg, std::string to_ip, int to_port);
+	void run(PlayerMessage tank_msg);
 };
 
 #endif // _CLIENT_CONNECTION_H

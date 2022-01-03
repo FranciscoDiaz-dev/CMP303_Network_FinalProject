@@ -31,6 +31,9 @@
     <Filter Include="ImGUI-master\ImGUI\misc\cpp">
       <UniqueIdentifier>{964affa4-44cd-48ce-a4f0-9b33c422df74}</UniqueIdentifier>
     </Filter>
+    <Filter Include="NetworkFramework">
+      <UniqueIdentifier>{9669179d-9610-4e05-b77b-845848ce905b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -84,30 +87,27 @@
     <ClCompile Include="ImGUI-master\ImGUI\imgui_widgets.cpp">
       <Filter>ImGUI-master\ImGUI</Filter>
     </ClCompile>
-    <ClCompile Include="ServersManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GameState_Selection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ImGUI-master\ImGUI\misc\cpp\imgui_stdlib.cpp">
       <Filter>ImGUI-master\ImGUI\misc\cpp</Filter>
     </ClCompile>
-    <ClCompile Include="ServerConnection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ConnectionBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ClientConnection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\NetworkFramework\ConnectionBase.cpp">
+      <Filter>NetworkFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\NetworkFramework\ServerConnection.cpp">
+      <Filter>NetworkFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="ServersManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Tank.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ConnectionMessage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NetworkSimulator.h">
@@ -146,22 +146,40 @@
     <ClInclude Include="ImGUI-master\ImGUI\imgui.h">
       <Filter>ImGUI-master\ImGUI</Filter>
     </ClInclude>
-    <ClInclude Include="ServersManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ClientServer_Message.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GameState_Selection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ServerConnection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ConnectionBase.h">
+    <ClInclude Include="ClientConnection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ClientConnection.h">
+    <ClInclude Include="..\..\NetworkFramework\ConnectionBase.h">
+      <Filter>NetworkFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NetworkFramework\ConnectionMessage.h">
+      <Filter>NetworkFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NetworkFramework\CustomizedPacketOperators.h">
+      <Filter>NetworkFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NetworkFramework\GameInfo.h">
+      <Filter>NetworkFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NetworkFramework\PlayerInfo.h">
+      <Filter>NetworkFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NetworkFramework\ServerConnection.h">
+      <Filter>NetworkFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NetworkFramework\ServerInfo.h">
+      <Filter>NetworkFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NetworkFramework\SockAddr.h">
+      <Filter>NetworkFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="ServersManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

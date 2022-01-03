@@ -8,6 +8,7 @@ NetworkSimulator::NetworkSimulator(float sendRate, float latency) :
 	m_SentTime(0),
 	m_SentX(128),
 	m_SentY(128),
+	m_Colour("red"),
 	m_SentVX(15),
 	m_SentVY(10),
 	m_SendRate(sendRate),
@@ -24,7 +25,7 @@ NetworkSimulator::~NetworkSimulator()
 
 
 
-bool NetworkSimulator::ReceiveMessage(TankMessage & result)
+bool NetworkSimulator::ReceiveMessage(PlayerInfo & result)
 {
 	if (m_MessageQueue.empty()) {
 		return false;
@@ -43,7 +44,7 @@ void NetworkSimulator::Update(float dt)
 	// Simulate messages being sent from a remote host every "period",
 	// delivered to this host after "latency".
 	while (m_SentTime + m_Latency < m_Time) {
-		m_MessageQueue.push({ 1, m_SentX, m_SentY, m_SentTime });
+		m_MessageQueue.push({ 1, m_SentX, m_SentY, m_Colour, m_SentTime });
 
 		m_SentTime += m_SendRate;
 

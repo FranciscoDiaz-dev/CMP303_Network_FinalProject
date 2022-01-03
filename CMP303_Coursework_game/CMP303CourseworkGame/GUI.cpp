@@ -43,12 +43,14 @@ namespace ImGui
 GUI::GUI(sf::RenderWindow* wnd, SharedContext* sharedContxt) :
 	isActivated(false),
 	window(wnd),
-	sharedContext(sharedContxt)
+	sharedContext(sharedContxt),
+	selectedServerIndex(0)
 {
 	ImGui::SFML::Init(*window);
 
 	// get the list of servers available
 	servers = sharedContext->serversManager->getServersList();
+	selectedServerInfo = sharedContext->serversManager->getServerInfoById(servers.at(selectedServerIndex));
 	tankColours = {"black", "blue", "green", "red"}; // tank colours available
 }
 
@@ -89,10 +91,9 @@ void GUI::render()
 		// Choosing Server
 		if (ImGui::Combo("Server", &selectedServerIndex, servers))
 		{
-			if (servers.at(selectedServerIndex) != sharedContext->serversManager->getSelectedServerName())
-			{
-				sharedContext->serversManager->setSelectedServer(servers.at(selectedServerIndex));
-			}
+			//update selected server info to show
+			selectedServerInfo = sharedContext->serversManager->getServerInfoById(servers.at(selectedServerIndex));
+
 		}
 
 		// Choosing Colour of the Tank
