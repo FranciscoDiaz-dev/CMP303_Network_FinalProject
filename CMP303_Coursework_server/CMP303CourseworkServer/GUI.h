@@ -9,6 +9,7 @@
 #include "../../NetworkFramework/ServerInfo.h"
 
 class ServersManager;
+class ServerConnection;
 
 
 using std::string;
@@ -19,7 +20,7 @@ class GUI
 
 public:
 	// constructor
-	GUI(sf::RenderWindow* wnd, ServersManager* serversMgr);
+	GUI(sf::RenderWindow* wnd, ServersManager* serversMgr, ServerConnection* serverConn);
 
 	// destructor
 	~GUI();
@@ -36,6 +37,7 @@ private:
 	sf::RenderWindow* window;
 
 	ServersManager* serversManager;
+	ServerConnection* serverConnection;
 
 	// servers available
 	vector<string> servers;

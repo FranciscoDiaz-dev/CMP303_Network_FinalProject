@@ -28,6 +28,7 @@ class GameState;
 class GUI;
 class Tank;
 class ServersManager;
+class ClientConnection;
 
 namespace sf
 {
@@ -39,7 +40,7 @@ struct SharedContext
 {
 	// constructor
 	SharedContext() : kGameName(nullptr), kMinWindowWith(nullptr), kMinWindowHeight(nullptr),
-		window(nullptr), input(nullptr), serversManager(nullptr), player(nullptr), netSimulator(nullptr), gameState(nullptr), gui(nullptr){}
+		window(nullptr), input(nullptr), serversManager(nullptr), player(nullptr), netSimulator(nullptr), gameState(nullptr), clientConnection(nullptr), gameId(nullptr), gui(nullptr){}
 
 	// components
 	const sf::String* kGameName; // name of the game, used in the window game
@@ -49,8 +50,10 @@ struct SharedContext
 	Input* input; // imput component
 	NetworkSimulator* netSimulator;
 	ServersManager* serversManager;
+	ClientConnection* clientConnection;
 	Tank* player;
 	GameState* gameState; // game state component which contains the current game state
+	int* gameId;
 	GUI* gui;
 };
 

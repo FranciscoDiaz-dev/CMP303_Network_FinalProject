@@ -1,6 +1,6 @@
 #include "ServersManager.h"
-#include "Utils.h"
-#include "../../NetworkFramework/SockAddr.h"
+#include "../Database/UtilsDataBase.h"
+#include "SockAddr.h"
 
 #include <sstream>
 
@@ -23,7 +23,7 @@ ServersManager::~ServersManager()
 void ServersManager::saveAddresses(const std::string& dataBasePath)
 {
     // Read the text and get its text
-    string fileText = Utils::getTextFromFile(dataBasePath);
+    string fileText = UtilsDataBase::getTextFromFile(dataBasePath);
     // delimiter between columns in the text
     char delimiter = ',';
 
@@ -67,7 +67,6 @@ void ServersManager::saveAddresses(const std::string& dataBasePath)
     }
 }
 
-
 std::vector<string> ServersManager::getServersList()
 {
     // create a list of servers with all the servers name
@@ -77,7 +76,6 @@ std::vector<string> ServersManager::getServersList()
 
     return servers;
 }
-
 
 ServerInfo ServersManager::getServerInfoById(string serverId) const
 {
@@ -90,4 +88,11 @@ ServerInfo ServersManager::getServerInfoById(string serverId) const
     {
         return ServerInfo();
     }
+}
+
+
+// select the server to use for this game
+void ServersManager::selectServer(string serverId)
+{
+    selectedServerInfo = getServerInfoById(serverId);
 }

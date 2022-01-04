@@ -34,6 +34,9 @@
     <Filter Include="NetworkFramework">
       <UniqueIdentifier>{9669179d-9610-4e05-b77b-845848ce905b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DataBase">
+      <UniqueIdentifier>{b748fef6-d3ff-4aa7-bf7d-4a8b5df8b82f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -58,9 +61,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GameStateManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GameState.cpp">
@@ -93,23 +93,26 @@
     <ClCompile Include="ImGUI-master\ImGUI\misc\cpp\imgui_stdlib.cpp">
       <Filter>ImGUI-master\ImGUI\misc\cpp</Filter>
     </ClCompile>
-    <ClCompile Include="ClientConnection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\NetworkFramework\ConnectionBase.cpp">
       <Filter>NetworkFramework</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\NetworkFramework\ServerConnection.cpp">
+    <ClCompile Include="..\..\NetworkFramework\ClientConnection.cpp">
       <Filter>NetworkFramework</Filter>
     </ClCompile>
-    <ClCompile Include="ServersManager.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\NetworkFramework\ConnectionMessage.cpp">
+      <Filter>NetworkFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\NetworkFramework\PlayerInfo.cpp">
+      <Filter>NetworkFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\NetworkFramework\ServersManager.cpp">
+      <Filter>NetworkFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Database\UtilsDataBase.cpp">
+      <Filter>DataBase</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Tank.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="NetworkSimulator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -126,9 +129,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GameStateManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SharedContext.h">
@@ -149,19 +149,10 @@
     <ClInclude Include="GameState_Selection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ServerConnection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ClientConnection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\NetworkFramework\ConnectionBase.h">
       <Filter>NetworkFramework</Filter>
     </ClInclude>
     <ClInclude Include="..\..\NetworkFramework\ConnectionMessage.h">
-      <Filter>NetworkFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\NetworkFramework\CustomizedPacketOperators.h">
       <Filter>NetworkFramework</Filter>
     </ClInclude>
     <ClInclude Include="..\..\NetworkFramework\GameInfo.h">
@@ -170,17 +161,28 @@
     <ClInclude Include="..\..\NetworkFramework\PlayerInfo.h">
       <Filter>NetworkFramework</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NetworkFramework\ServerConnection.h">
-      <Filter>NetworkFramework</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\NetworkFramework\ServerInfo.h">
       <Filter>NetworkFramework</Filter>
     </ClInclude>
     <ClInclude Include="..\..\NetworkFramework\SockAddr.h">
       <Filter>NetworkFramework</Filter>
     </ClInclude>
-    <ClInclude Include="ServersManager.h">
+    <ClInclude Include="..\..\NetworkFramework\ClientConnection.h">
+      <Filter>NetworkFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NetworkFramework\ServersManager.h">
+      <Filter>NetworkFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Database\UtilsDataBase.h">
+      <Filter>DataBase</Filter>
+    </ClInclude>
+    <ClInclude Include="Tank.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Database\servers_addresses.csv">
+      <Filter>DataBase</Filter>
+    </None>
   </ItemGroup>
 </Project>

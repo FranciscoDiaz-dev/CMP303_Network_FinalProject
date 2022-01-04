@@ -13,7 +13,8 @@
 #include "Framework/Input.h"
 #include "GameStateManager.h"
 #include "NetworkSimulator.h"
-#include "ServersManager.h"
+#include "../../NetworkFramework/ServersManager.h"
+#include "../../NetworkFramework/ClientConnection.h"
 #include "Tank.h"
 #include <Windows.h> // for get the local time
 
@@ -28,8 +29,9 @@ void windowProcess(sf::RenderWindow* window, Input* in, GUI* gui, const unsigned
 	sf::Event event;
 	while (window->pollEvent(event))
 	{
-		// process event for the gui
-		gui->processEvent(event);
+		// process event for the gui if it exists
+		if(gui != nullptr)
+			gui->processEvent(event);
 
 		// process windows event
 		switch (event.type)
@@ -103,6 +105,7 @@ int main()
 	Input input; // imput component used in all the game
 	GameState gameState; // game state component which contains the current game state
 	Tank player;
+	int gameId = -1;
 
 	//Create a network simulator with that "sends" a message every 0.5 seconds and has a latency of 0.3 seconds
 	float sendRate = 0.5f;
@@ -110,6 +113,7 @@ int main()
 	NetworkSimulator netSimulator(sendRate, latency);
 	netSimulator.m_MyID = 0;	//On the network, we are Tank 0
 
+	ClientConnection clientConnection;
 	ServersManager serversMgr;
 
 	// Create SharedContext which it contains all the components we will need in the game states
@@ -123,11 +127,8 @@ int main()
 	sharedContext.gameState = &gameState;
 	sharedContext.serversManager = &serversMgr;
 	sharedContext.player = &player;
-
-	// Declare our ImGui
-	GUI gui(&window, &sharedContext);
-	sharedContext.gui = &gui;
-
+	sharedContext.gameId = &gameId;
+	sharedContext.clientConnection = &clientConnection;
 
 	// Initilise GameStateManager 
 	GameStateManager gameStateManager(&sharedContext);

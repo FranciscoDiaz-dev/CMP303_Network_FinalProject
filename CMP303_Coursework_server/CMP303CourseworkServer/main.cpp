@@ -11,7 +11,8 @@
 #include <SFML\Graphics.hpp>
 #include <iostream>
 #include "Framework/Input.h"
-#include "ServersManager.h"
+#include "../../NetworkFramework/ServersManager.h"
+#include "../../NetworkFramework/ServerConnection.h"
 #include <Windows.h> // for get the local time
 
 #include "GUI.h"
@@ -100,14 +101,24 @@ int main()
 
 	// Declare servers manager
 	ServersManager serversMgr;
+	ServerConnection* serverConnection = nullptr;
 
 	// Declare our ImGui
-	GUI gui(&window, &serversMgr);
-
+	GUI gui(&window, &serversMgr, serverConnection);
 
 	// Initialise objects for delta time
 	sf::Clock gameClock;
 	sf::Time deltaTime;
+
+	// Text
+	sf::Font montserratFont;
+	sf::Text debugText;
+
+	// initialise font and text
+	montserratFont.loadFromFile("Assets/Montserrat-Regular.ttf");
+	debugText.setFont(montserratFont);
+	debugText.setOutlineColor(sf::Color::Black);
+	debugText.setOutlineThickness(1.f);
 
 	// Game Loop
 	while (window.isOpen())
@@ -118,15 +129,31 @@ int main()
 		// Calculate delta time. How much time has passed 
 		// since it was last calculated (in seconds) and restart the clock->
 		deltaTime = gameClock.restart();
-		
-		// Call standard game loop functions (input, update and render)
-		gui.update(deltaTime);
-		// Render
-		window.clear(sf::Color(100, 149, 237));
-			gui.render();
-		window.display();
 
-		serversMgr.runServer();
+		// Run Server if it has been initialised
+		if (serverConnection != nullptr)
+		{
+			// update server data
+			serverConnection->run();
+		}
+		// If not run the Menu where the user can select and run a server
+		else
+		{
+			// update the Gui
+			gui.update(deltaTime);
+
+			// Render GUI
+			window.clear(sf::Color(100, 149, 237));
+				gui.render();
+			window.display();
+		}
+	}
+
+	// Destroy the server if it has not been destroyed yet
+	if (serverConnection != nullptr)
+	{
+		delete serverConnection;
+		serverConnection = nullptr;
 	}
 
 	return 0;

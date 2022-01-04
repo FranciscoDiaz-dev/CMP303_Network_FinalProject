@@ -2,10 +2,13 @@
 #define _SERVER_CONNECTION_H
 #pragma once
 
-#include <map>
+#include <vector>
+#include <string>
 #include "ConnectionBase.h"
 #include "GameInfo.h"
 #include "ServerInfo.h"
+
+using std::string;
 
 class ServerConnection : public ConnectionBase
 {
@@ -23,22 +26,22 @@ public:
 	bool getIsRunning() const { return isRunning; };
 	string getServerId() const { return serverId; };
 
-	void addNewPlayer(GameInfo* gameInfo, SockAddr playerSockAddr);
-
-	// return the game id which can host a new player
-	// if there are not games which can host a new player then return -1
-	int gameIDCanHost();
-
-	// return a game which is not full of players
-	GameInfo getAvailableGame();
-
 private:
 	string serverId;
 	bool isRunning;
 
-	std::map<int, GameInfo> activeGames;
+	std::vector<GameInfo*> activeGames;
 	int maxNumPlayersPerGame;
 	int maxNumGames;
+
+	void addNewPlayer(GameInfo* gameInfo, SockAddr playerSockAddr, PlayerInfo newPlayerInfo);
+
+	// return the game id which can host a new player
+	// if there are not games which can host a new player it will return -1
+	int getAGameIdCanHost();
+
+	// Return a game info pointer which has that id
+	GameInfo* getGameInfoById(int id);
 };
 
 #endif // _SERVER_CONNECTION_H

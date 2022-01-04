@@ -19,8 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Database\UtilsDataBase.cpp" />
     <ClCompile Include="..\..\NetworkFramework\ConnectionBase.cpp" />
+    <ClCompile Include="..\..\NetworkFramework\ConnectionMessage.cpp" />
+    <ClCompile Include="..\..\NetworkFramework\PlayerInfo.cpp" />
     <ClCompile Include="..\..\NetworkFramework\ServerConnection.cpp" />
+    <ClCompile Include="..\..\NetworkFramework\ServersManager.cpp" />
     <ClCompile Include="Framework\Input.cpp" />
     <ClCompile Include="Framework\Vector.cpp" />
     <ClCompile Include="GameState.cpp" />
@@ -33,17 +37,17 @@
     <ClCompile Include="ImGUI-master\ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="ImGUI-master\ImGUI\misc\cpp\imgui_stdlib.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="ServersManager.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Database\UtilsDataBase.h" />
     <ClInclude Include="..\..\NetworkFramework\ConnectionBase.h" />
     <ClInclude Include="..\..\NetworkFramework\ConnectionMessage.h" />
     <ClInclude Include="..\..\NetworkFramework\GameInfo.h" />
     <ClInclude Include="..\..\NetworkFramework\PlayerInfo.h" />
-    <ClInclude Include="..\..\NetworkFramework\CustomizedPacketOperators.h" />
     <ClInclude Include="..\..\NetworkFramework\ServerConnection.h" />
     <ClInclude Include="..\..\NetworkFramework\ServerInfo.h" />
+    <ClInclude Include="..\..\NetworkFramework\ServersManager.h" />
     <ClInclude Include="..\..\NetworkFramework\SockAddr.h" />
     <ClInclude Include="Framework\Input.h" />
     <ClInclude Include="Framework\Vector.h" />
@@ -51,8 +55,10 @@
     <ClInclude Include="GUI.h" />
     <ClInclude Include="ImGUI-master\ImGUI-SFML\imgui-SFML.h" />
     <ClInclude Include="ImGUI-master\ImGUI\imgui.h" />
-    <ClInclude Include="ServersManager.h" />
     <ClInclude Include="Utils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Database\servers_addresses.csv" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

@@ -1,11 +1,10 @@
 #include "Tank.h"
-#include "Utils.h"
 
 
 Tank::Tank() : sf::Sprite()
 {
-	m_PlayerName = "Player X";
 	SetColour("Red");
+	m_PlayerInfo.id = 0;
 }
 
 
@@ -22,9 +21,16 @@ void Tank::Update(float dt)
 	setPosition(latestMessage.x, latestMessage.y);
 }
 
-void Tank::setPosition(float x, float y) {
+void Tank::setPosition(float x, float y)
+{
+	// set position of the body sprite
 	sf::Sprite::setPosition(x, y);
+	// set position of the barrel sprite
 	m_BarrelSprite.setPosition(getPosition());
+	// save position in the player info struc
+	m_PlayerInfo.x = x;
+	m_PlayerInfo.y = y;
+	m_PlayerInfo.time = 1.0f; // TODO: MOVE TO ANOTHER PLACE
 }
 
 
@@ -34,11 +40,12 @@ void Tank::setGhostPosition(sf::Vector2f pos) {
 
 void Tank::SetColour(std::string colour)
 {
-	m_Colour = colour;
+	// save player colour
+	m_PlayerInfo.colour = colour;
 
 	// Change texture
-	m_BodyTexture.loadFromFile("Assets/" + m_Colour + "Tank.png");
-	m_BarrelTexture.loadFromFile("Assets/" + m_Colour + "Barrel.png");
+	m_BodyTexture.loadFromFile("Assets/" + m_PlayerInfo.colour + "Tank.png");
+	m_BarrelTexture.loadFromFile("Assets/" + m_PlayerInfo.colour + "Barrel.png");
 	setTexture(m_BodyTexture);
 
 	setOrigin(getTextureRect().width / 2, getTextureRect().height / 2);
@@ -64,7 +71,9 @@ const void Tank::Render(sf::RenderWindow* window) {
 	}
 }
 
-void Tank::AddMessage(const PlayerInfo& msg) {
+
+void Tank::AddMessage(const PlayerInfo& msg)
+{
 	m_Messages.push_back(msg);
 }
 

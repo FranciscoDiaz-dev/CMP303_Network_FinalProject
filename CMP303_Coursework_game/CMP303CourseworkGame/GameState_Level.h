@@ -12,6 +12,8 @@
 #include "GameStateManager.h"
 #include "Tank.h"
 #include "GUI.h"
+#include "..\..\NetworkFramework\ClientConnection.h"
+#include "..\..\NetworkFramework\ServersManager.h"
 
 #include <vector>
 
@@ -52,6 +54,9 @@ private:
 	sf::Text debugText;
 
 	GUI* gui;
+	ClientConnection* clientConnection;
+	ServersManager* serversMgr;
+	int* gameId;
 };
 
 #endif _GAMESTATE_LEVEL_H

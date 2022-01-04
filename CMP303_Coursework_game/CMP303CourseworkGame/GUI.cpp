@@ -6,8 +6,10 @@
 #include "ImGUI\misc\cpp\imgui_stdlib.h"
 
 #include "SharedContext.h"
-#include "ServersManager.h"
+#include "..\..\NetworkFramework\ServersManager.h"
+#include "..\..\NetworkFramework\ClientConnection.h"
 #include "Tank.h"
+#include "GameStateManager.h"
 
 
 // Redefine callbackCombo and ListBox to use std::vector<std::string> instead arrays of const char
@@ -40,18 +42,23 @@ namespace ImGui
 }
 
 
-GUI::GUI(sf::RenderWindow* wnd, SharedContext* sharedContxt) :
-	isActivated(false),
-	window(wnd),
-	sharedContext(sharedContxt),
-	selectedServerIndex(0)
+GUI::GUI(GameStateManager* gameStateManager) :
+	selectedServerIndex(0),
+	selectedColourIndex(0),
+	gameStateMgr(gameStateManager)
 {
-	ImGui::SFML::Init(*window);
-
 	// get the list of servers available
-	servers = sharedContext->serversManager->getServersList();
-	selectedServerInfo = sharedContext->serversManager->getServerInfoById(servers.at(selectedServerIndex));
-	tankColours = {"black", "blue", "green", "red"}; // tank colours available
+	window = gameStateMgr->getSharedContext()->window;
+	serversMgr = gameStateMgr->getSharedContext()->serversManager;
+	player = gameStateMgr->getSharedContext()->player;
+	gameId = gameStateMgr->getSharedContext()->gameId;
+	clientConnection = gameStateMgr->getSharedContext()->clientConnection;
+
+	// update server list
+	servers = serversMgr->getServersList();
+	playerColours = {"black", "blue", "green", "red"}; // player colours available
+
+	ImGui::SFML::Init(*window);
 }
 
 GUI::~GUI()
@@ -74,49 +81,39 @@ void GUI::render()
 {
 	ImGui::Begin("Game Settings"); // begin window
 
-		// Player Name
-		// Input
-		if (sharedContext->player != nullptr)
-		{
-			std::string playerName = sharedContext->player->GetPlayerName();
-			ImGui::InputText("Player Name", &playerName);
-
-			// Button
-			if (ImGui::Button("Apply Name"))
-			{
-				window->setTitle(playerName);
-			}
-		}
-
 		// Choosing Server
 		if (ImGui::Combo("Server", &selectedServerIndex, servers))
 		{
-			//update selected server info to show
-			selectedServerInfo = sharedContext->serversManager->getServerInfoById(servers.at(selectedServerIndex));
-
 		}
 
 		// Choosing Colour of the Tank
-		if (ImGui::Combo("Tank Colour", &selectedColourIndex, tankColours))
+		if (ImGui::Combo("Tank Colour", &selectedColourIndex, playerColours))
 		{
-			if (tankColours.at(selectedColourIndex) != sharedContext->player->GetColour())
-			{
-				sharedContext->player->SetColour(tankColours.at(selectedColourIndex));
-			}
 		}
+
+		if (ImGui::Button("Find a game"))
+		{
+			// Apply colour
+			if (playerColours.at(selectedColourIndex) != player->GetColour())
+			{
+				player->SetColour(playerColours.at(selectedColourIndex));
+			}
+
+			// Apply selected server
+			serversMgr->selectServer(servers.at(selectedServerIndex));
+
+			PlayerMessage playerMsg;
+			playerMsg.gameId = *gameId;
+			playerMsg.playerInfo = player->getPlayerInfo();
+
+			bool joined = clientConnection->joinAGame(&playerMsg, serversMgr->getSelectedServer().sockAddr);
+
+			if (joined)
+				gameStateMgr->switchTo(GState::LEVEL);
+		}
+
 	ImGui::End(); // end window
 
 	// render the window
 	ImGui::SFML::Render(*window);
-}
-
-
-void GUI::active()
-{
-	isActivated = true;
-}
-
-void GUI::deactive()
-{
-	isActivated = false;
 }

@@ -2,8 +2,9 @@
 #define _CLIENT_CONNECTION_H
 #pragma once
 
-#include "../../NetworkFramework/ConnectionBase.h"
-#include "../../NetworkFramework/ConnectionMessage.h"
+#include "ConnectionBase.h"
+#include "ConnectionMessage.h"
+
 
 class ClientConnection : public ConnectionBase
 {
@@ -14,7 +15,7 @@ public:
 	~ClientConnection();
 
 	// run the conexion to a server
-	void run(PlayerMessage tank_msg);
+	bool joinAGame(PlayerMessage* playerMsg, SockAddr toSockAddr);
 };
 
 #endif // _CLIENT_CONNECTION_H

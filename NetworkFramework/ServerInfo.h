@@ -8,6 +8,7 @@
 
 struct ServerInfo
 {
+	ServerInfo () : name("") {}
 	// components
 	std::string name;
 	SockAddr sockAddr;

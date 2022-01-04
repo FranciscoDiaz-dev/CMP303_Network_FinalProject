@@ -34,7 +34,7 @@ public:
 	void render() override;
 
 private:
-	// Players
+	// This player object
 	Tank* player;
 
 	// Text

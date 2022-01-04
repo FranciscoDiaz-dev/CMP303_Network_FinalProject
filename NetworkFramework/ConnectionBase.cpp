@@ -10,43 +10,47 @@ ConnectionBase::~ConnectionBase()
 	printf("Quitting\n");
 }
 
-bool ConnectionBase::sendMessage(sf::Packet packet, SockAddr toSockAddr, sf::Time timeout)
+bool ConnectionBase::udpSendMessage(sf::Packet packet, SockAddr toSockAddr, sf::Time timeout)
 {
-	printf("\nSending Message:\n");
+	printf("Sending Message:\n");
 
-	if (socket.send(packet, toSockAddr.ipAddr, toSockAddr.port) != sf::Socket::Done)
+	if (udpSocket.send(packet, toSockAddr.ipAddr, toSockAddr.port) != sf::Socket::Done)
 	{
-		printf("Error sending message.");
+		printf("Error sending message.\n");
 		return false;
 	}
 	else
 	{
-		printf("Message sent to ip:%s and port:%d", toSockAddr.ipAddr.toString(), toSockAddr.port);
+		printf("Message sent to ip:%s and port:%d.\n", toSockAddr.ipAddr.toString().c_str(), toSockAddr.port);
 		return true;
 	}
 }
 
-sf::Packet ConnectionBase::receiveMessage(SockAddr* fromSockAddr, sf::Time timeout)
+bool ConnectionBase::udpReceiveMessage(sf::Packet* packet, SockAddr* fromSockAddr, sf::Time timeout)
 {
-	sf::Packet packet; // variable where the message will be saved, if it fails, it will return a message with id == -1
+	// add the socket to the selector
+	selector.add(udpSocket);
 
-	if (fromSockAddr != nullptr && selector.wait(timeout))
+	if (selector.wait(timeout))
 	{
 		// Test if we have to read 
-		if (selector.isReady(socket))
+		if (selector.isReady(udpSocket))
 		{
-			printf("\nReading Message:\n");
+			printf("Reading Message:\n");
 
-			if (socket.receive(packet, fromSockAddr->ipAddr, fromSockAddr->port) != sf::Socket::Done)
+			if (udpSocket.receive(*packet, fromSockAddr->ipAddr, fromSockAddr->port) != sf::Socket::Done)
 			{
-				printf("Error receiving message.");
+				printf("Error receiving message.\n");
+				return false;
 			}
 			else
 			{
-				printf("Message received from ip:%s and port:%d", fromSockAddr->ipAddr.toString(), fromSockAddr->port);
+				printf("Message received from ip:%s and port:%d.\n", fromSockAddr->ipAddr.toString().c_str(), fromSockAddr->port);
+				return true;
 			}
 		}
 	}
 
-	return packet;
+	// timeout finished and none message was received
+	return false;
 }

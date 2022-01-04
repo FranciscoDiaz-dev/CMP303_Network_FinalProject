@@ -44,11 +44,11 @@ void NetworkSimulator::Update(float dt)
 	// Simulate messages being sent from a remote host every "period",
 	// delivered to this host after "latency".
 	while (m_SentTime + m_Latency < m_Time) {
-		m_MessageQueue.push({ 1, m_SentX, m_SentY, m_Colour, m_SentTime });
+		m_MessageQueue.push(PlayerInfo(1, m_SentX, m_SentY, m_Colour, m_SentTime ));
 
 		m_SentTime += m_SendRate;
 
-		// Change the path of the tank after a while.
+		// Change the path of the player after a while.
 		if (m_SentTime >= 12.77f) {
 			m_SentVX = 25.0f;
 			m_SentVY = -10.0f;

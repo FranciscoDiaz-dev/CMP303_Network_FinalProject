@@ -1,6 +1,5 @@
 #include "GameState_Level.h"
 
-#include "Utils.h"
 #include "Framework/Input.h"
 #include "NetworkSimulator.h"
 
@@ -18,8 +17,10 @@ GameState_Level::GameState_Level(GameStateManager* stateMgr) : GameStateBase(sta
 	debugText.setOutlineColor(sf::Color::Black);
 	debugText.setOutlineThickness(1.f);
 
-	gui = gameStateManager->getSharedContext()->gui;
 	player = gameStateManager->getSharedContext()->player;
+	serversMgr = gameStateManager->getSharedContext()->serversManager;
+	gameId = gameStateManager->getSharedContext()->gameId;
+	clientConnection = gameStateManager->getSharedContext()->clientConnection;
 
 	enemies.push_back(new Tank());
 	enemies.push_back(new Tank());
@@ -35,10 +36,10 @@ GameState_Level::GameState_Level(GameStateManager* stateMgr) : GameStateBase(sta
 
 GameState_Level::~GameState_Level()
 {
-	for (Tank* tank: enemies)
+	for (Tank* player: enemies)
 	{
-		delete tank;
-		tank = nullptr;
+		delete player;
+		player = nullptr;
 	}
 }
 
@@ -49,7 +50,7 @@ void GameState_Level::handleInput(sf::Time dt)
 	{
 		input->setKeyUp(sf::Keyboard::R);
 
-		// Reset tanks
+		// Reset players
 		player->Reset();
 		enemies.at(0)->Reset();
 		enemies.at(0)->Reset();
@@ -64,14 +65,27 @@ void GameState_Level::update(sf::Time dt)
 {
 
 	// Update text
-	debugText.setString("Game Time: " + Utils::stringify(netSimulator->Time()));
+	//debugText.setString("Game Time: " + Utils::stringify(netSimulator->Time()));
 
-	// update gui
-	gui->update(dt);
+	// create message
+	PlayerMessage playerMsg;
+	playerMsg.gameId = *gameId;
+	playerMsg.playerInfo = player->getPlayerInfo();
+	// send it
+	if (*gameId == -1)
+	{
+		bool joined = clientConnection->joinAGame(&playerMsg, serversMgr->getSelectedServer().sockAddr);
+		if (joined)
+		{
+			*gameId = playerMsg.gameId;
+			player->setPlayerId(playerMsg.playerInfo.id);
+		}
+	}
+
 
 	//If we're at the start, just advance the time by 3.5 seconds, so we have a few packets in the queue already
 	if (netSimulator->Time() < 1.0f) {
-		printf("BEGIN SIMULATION\n");
+		//printf("BEGIN SIMULATION\n");
 		netSimulator->Update(netSimulator->getStartTime());
 	}
 
@@ -82,7 +96,7 @@ void GameState_Level::update(sf::Time dt)
 		netSimulator->Update(dt.asSeconds());
 		//Get any 'network' messages that are available
 		while (netSimulator->ReceiveMessage(msg)) {
-			printf("Received message: ID= %d, Pos = (%.2f, %.2f), Time =%.2f\n", msg.id, msg.x, msg.y, msg.time);
+			//printf("Received message: ID= %d, Pos = (%.2f, %.2f), Time =%.2f\n", msg.id, msg.x, msg.y, msg.time);
 			enemies[msg.id]->AddMessage(msg);
 		}
 
@@ -90,21 +104,21 @@ void GameState_Level::update(sf::Time dt)
 		float nextPrint = netSimulator->getNextPrint();
 
 		// Update the player
-		player->Update(dt.asSeconds());	//Update the real position of the tank with the info from the latest packet
+		player->Update(dt.asSeconds());	//Update the real position of the player with the info from the latest packet
 
-		//Update the tanks
+		//Update the players
 		for (int i = 0; i < (int)enemies.size(); i++)
 		{
-			enemies.at(i)->Update(dt.asSeconds());	//Update the real position of the tank with the info from the latest packet
+			enemies.at(i)->Update(dt.asSeconds());	//Update the real position of the player with the info from the latest packet
 
-			//Get the predicted position of the tank at the current Game Time and move the ghost to that position
+			//Get the predicted position of the player at the current Game Time and move the ghost to that position
 			enemies.at(i)->setGhostPosition(enemies.at(i)->RunPrediction(netSimulator->Time()));
 
 			if (netSimulator->Time() > nextPrint)
 			{
-				//Get the predicted position of the tank at a specific interval and print it to the console
+				//Get the predicted position of the player at a specific interval and print it to the console
 				sf::Vector2f predictedPosition = enemies.at(i)->RunPrediction(nextPrint);
-				printf("\tPredicted positiion:  (%.2f, %.2f), Time =%.2f\n", predictedPosition.x, predictedPosition.y, nextPrint);
+				//printf("\tPredicted positiion:  (%.2f, %.2f), Time =%.2f\n", predictedPosition.x, predictedPosition.y, nextPrint);
 				nextPrint = nextPrint + (netSimulator->getSendRate() * 0.25f);	//Print 4 times per packet
 				netSimulator->SetNextPrint(nextPrint);
 			}
@@ -119,19 +133,18 @@ void GameState_Level::render()
 		// Render the brackground
 		window->draw(floor);
 
-		// Render this player
-		player->Render(window);
+			// Render this player
+			player->Render(window);
 
-		// Render the enemies
-		for (Tank* tank : enemies)
-		{
-			tank->Render(window);
-		}
+			// Render the enemies
+			for (Tank* player : enemies)
+			{
+				player->Render(window);
+			}
 
 		// Render the text
 		window->draw(debugText);
 
-		gui->render();
 	
 	endDraw();
 }

@@ -6,8 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "../../NetworkFramework/ServerConnection.h"
-#include "../../NetworkFramework/ServerInfo.h"
+#include "ServerInfo.h"
 
 using std::string; using std::map; using std::vector;
 
@@ -19,33 +18,30 @@ public:
 	// destructor
 	~ServersManager();
 
-	// return the collection of addresses for each server
+	// return the collection of addresses of each server
 	map<string, ServerInfo> getServersAddresses() { return infoServers; };
-	// return a list with all the servers
+
+	// return a list with all the servers ids
 	vector<string> getServersList();
 
-	// find the server id on the list and selected it if it is available
-	// return if it has been found and it is available
-	bool initialiseServerById(string serverId);
-	bool createServerConnection(ServerInfo& serverInfo);
-	string getActiveServerId() const;
+	// return the server info by its id
 	ServerInfo getServerInfoById(string serverId) const;
 
-	// delete the server
-	void deleteServerConnection();
+	// select the server to use for this game
+	void selectServer(string serverId);
 
-	// run the active server
-	void runServer();
+	ServerInfo getSelectedServer() { return selectedServerInfo; };
 
 private:
 	// Component where the data/info for each server is saved
+	// string is the Id of the server
 	map<string, ServerInfo> infoServers;
 
 	// Save each server address into the map
 	void saveAddresses(const std::string& dataBasePath);
 
-	// Server
-	ServerConnection* activeServer;
+	// the information of the server which has been selected (server being used)
+	ServerInfo selectedServerInfo;
 };
 
 #endif //_SERVERS_MANAGER_H

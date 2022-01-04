@@ -1,6 +1,5 @@
 #include "GameState_Selection.h"
 
-#include "Utils.h"
 #include "Framework/Input.h"
 #include "NetworkSimulator.h"
 
@@ -15,16 +14,22 @@ GameState_Selection::GameState_Selection(GameStateManager* stateMgr) : GameState
 	instructionsText.setFont(montserratFont);
 	instructionsText.setOutlineColor(sf::Color::Black);
 	instructionsText.setOutlineThickness(1.f);
-	instructionsText.setString("Introduce:\n player name, \n select server \n and tank colour.");
+	instructionsText.setString("Introduce:\n player name, \n select server \n and player colour.");
 	instructionsText.setPosition(window->getView().getCenter()/2.0f);
 
 	// get the objects to use on this class from the shared context
-	gui = gameStateManager->getSharedContext()->gui;
 	player = gameStateManager->getSharedContext()->player;
+
+	// Declare our ImGui
+	gui = new GUI(stateMgr);
+	// save the gui in the shared context
+	gameStateManager->getSharedContext()->gui = gui;
 }
 
 GameState_Selection::~GameState_Selection()
 {
+	delete gui;
+	gui = nullptr;
 }
 
 void GameState_Selection::handleInput(sf::Time dt)
@@ -44,7 +49,7 @@ void GameState_Selection::update(sf::Time dt)
 {
 	// Update text
 	//infoText.setString("Waiting for other players. Current players: " + );
-	infoText.setString("Game Time: " + Utils::stringify(netSimulator->Time()));
+	//infoText.setString("Game Time: " + Utils::stringify(netSimulator->Time()));
 
 	// update gui
 	gui->update(dt);

@@ -5,7 +5,8 @@
 #include "ImGUI-SFML\imgui-SFML.h"
 #include "ImGUI\misc\cpp\imgui_stdlib.h"
 
-#include "ServersManager.h"
+#include "..\..\NetworkFramework\ServersManager.h"
+#include "..\..\NetworkFramework\ServerConnection.h"
 
 
 // Redefine callbackCombo and ListBox to use std::vector<std::string> instead arrays of const char
@@ -38,9 +39,10 @@ namespace ImGui
 }
 
 
-GUI::GUI(sf::RenderWindow* wnd, ServersManager* serversMgr) :
+GUI::GUI(sf::RenderWindow* wnd, ServersManager* serversMgr, ServerConnection* serverConn) :
 	window(wnd),
-	serversManager(serversMgr)
+	serversManager(serversMgr),
+	serverConnection(serverConn)
 {
 	// init GUI
 	ImGui::SFML::Init(*window);
@@ -72,20 +74,23 @@ void GUI::render()
 {
 	ImGui::Begin("Server Settings"); // begin window
 
-		//Title
-		ImGui::Text("Choose a server:");
 
-
-		ServerInfo selectedServerInfo = serversManager->getServerInfoById(servers.at(selectedServerIndex));
-
-		// Choosing Server
-		if (ImGui::Combo("Servers", &selectedServerIndex, servers))
+		// Show list for choosing server if it has not already been choosen
+		if (serverConnection == nullptr)
 		{
-			//selectedServerInfo = serversManager->getServerInfoById(servers.at(selectedServerIndex));
-			serversManager->initialiseServerById(servers.at(selectedServerIndex));
+			//Title
+			ImGui::Text("Choose a server:");
+
+			// Show List Server
+			if (ImGui::Combo("Servers", &selectedServerIndex, servers))
+			{
+			}
+
 		}
 
-		// Server Details
+		// Show Selected Server Details
+		ServerInfo selectedServerInfo = serversManager->getServerInfoById(servers.at(selectedServerIndex));
+
 		if (selectedServerInfo.name != "")
 		{
 			ImGui::Text("\n");
@@ -93,6 +98,23 @@ void GUI::render()
 			ImGui::Text(string("Name: " + selectedServerInfo.name).c_str());
 			ImGui::Text(string("IP: " + selectedServerInfo.sockAddr.ipAddr.toString()).c_str());
 			ImGui::Text("Port: %d", selectedServerInfo.sockAddr.port);
+			if(serverConnection != nullptr)
+				ImGui::Text("Status: Running");
+			ImGui::Text("\n");
+		}
+
+		// Run the selected server
+		if (serverConnection == nullptr && ImGui::Button("Run"))
+		{
+			serversManager->selectServer(servers.at(selectedServerIndex));// initialiseServerById(servers.at(selectedServerIndex));
+
+			serverConnection = new ServerConnection(servers.at(selectedServerIndex), selectedServerInfo);
+		}
+		// Stop the selected server
+		else if (serverConnection != nullptr && ImGui::Button("Stop"))
+		{
+			delete serverConnection;
+			serverConnection = nullptr;
 		}
 
 	ImGui::End(); // end window

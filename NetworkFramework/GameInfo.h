@@ -9,12 +9,12 @@
 struct GameInfo
 {
 	// constructor
-	GameInfo() : id(-1), numPlayers(-1){}
+	GameInfo() : id(-1), numPlayers(0){}
 
 	// components
-	int id; // identifier of this game
-	int numPlayers;
-	std::vector<PlayerInfo> playerInfo; // information of the tanks of this game
+	int id; // identifier of this game (if it is -1 means not game has beeen assigned to it yet)
+	int numPlayers; // number of players this game currently has
+	std::vector<PlayerInfo> playersInfo; // information of the players of this game
 	std::vector<SockAddr> playersSockAddr; // addresses of each player
 };
 

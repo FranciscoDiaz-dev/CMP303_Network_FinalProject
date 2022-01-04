@@ -6,9 +6,11 @@
 #include <string>
 #include <SFML/Graphics.hpp>
 
-#include "../../NetworkFramework/ServerInfo.h"
-
 class SharedContext;
+class GameStateManager;
+class ServersManager;
+class Tank;
+class ClientConnection;
 
 
 using std::string;
@@ -19,7 +21,7 @@ class GUI
 
 public:
 	// constructor
-	GUI(sf::RenderWindow* wnd, SharedContext* sharedContxt);
+	GUI(GameStateManager* gameStateMgr);
 
 	// destructor
 	~GUI();
@@ -31,24 +33,21 @@ public:
 	// render
 	void render();
 
-	// Activate ImGui
-	void active();
-	void deactive();
-
-private:
-	bool isActivated;
+private:	
+	GameStateManager* gameStateMgr;
 	sf::RenderWindow* window;
-
-	SharedContext* sharedContext;
+	ServersManager* serversMgr;
+	ClientConnection* clientConnection;
+	Tank* player;
+	int* gameId;
 
 	// servers available
 	vector<string> servers;
-	ServerInfo selectedServerInfo;
 	int selectedServerIndex;
 
-	// tank colours available
-	vector<string> tankColours;
-	int selectedColourIndex = 0;
+	// player colours available
+	vector<string> playerColours;
+	int selectedColourIndex;
 };
 
 #endif //_GUI_H

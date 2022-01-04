@@ -34,6 +34,9 @@
     <Filter Include="NetworkFramework">
       <UniqueIdentifier>{e910e7c7-4ae7-4010-a87c-8a5c2c5566d4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DataBase">
+      <UniqueIdentifier>{f6bf3e5c-02c4-4fd7-9b5a-cee10513e071}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -72,9 +75,6 @@
     <ClCompile Include="ImGUI-master\ImGUI\imgui_widgets.cpp">
       <Filter>ImGUI-master\ImGUI</Filter>
     </ClCompile>
-    <ClCompile Include="ServersManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ImGUI-master\ImGUI\misc\cpp\imgui_stdlib.cpp">
       <Filter>ImGUI-master\ImGUI\misc\cpp</Filter>
     </ClCompile>
@@ -83,6 +83,18 @@
     </ClCompile>
     <ClCompile Include="..\..\NetworkFramework\ServerConnection.cpp">
       <Filter>NetworkFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\NetworkFramework\ConnectionMessage.cpp">
+      <Filter>NetworkFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\NetworkFramework\PlayerInfo.cpp">
+      <Filter>NetworkFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\NetworkFramework\ServersManager.cpp">
+      <Filter>NetworkFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Database\UtilsDataBase.cpp">
+      <Filter>DataBase</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -107,16 +119,10 @@
     <ClInclude Include="ImGUI-master\ImGUI\imgui.h">
       <Filter>ImGUI-master\ImGUI</Filter>
     </ClInclude>
-    <ClInclude Include="ServersManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\NetworkFramework\ConnectionBase.h">
       <Filter>NetworkFramework</Filter>
     </ClInclude>
     <ClInclude Include="..\..\NetworkFramework\ConnectionMessage.h">
-      <Filter>NetworkFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\NetworkFramework\CustomizedPacketOperators.h">
       <Filter>NetworkFramework</Filter>
     </ClInclude>
     <ClInclude Include="..\..\NetworkFramework\ServerConnection.h">
@@ -134,5 +140,16 @@
     <ClInclude Include="..\..\NetworkFramework\GameInfo.h">
       <Filter>NetworkFramework</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\NetworkFramework\ServersManager.h">
+      <Filter>NetworkFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Database\UtilsDataBase.h">
+      <Filter>DataBase</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Database\servers_addresses.csv">
+      <Filter>DataBase</Filter>
+    </None>
   </ItemGroup>
 </Project>
