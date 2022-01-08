@@ -5,6 +5,7 @@ GameStateManager::GameStateManager(SharedContext* shContext): sharedContext(shCo
 {
 	// Register all the game states are availables in this game and with which class are linked/related
 	RegisterState<GameState_Selection>(GState::SELECTION);
+	RegisterState<GameState_WaitingRoom>(GState::WAITING_ROOM);
 	RegisterState<GameState_Level>(GState::LEVEL);
 	//RegisterState<GameState_GameOver>(GState::GAME_OVER);
 }
@@ -135,6 +136,9 @@ void GameStateManager::createState(const GState& gState)
 	{
 	case(GState::SELECTION):
 		stateBase = new GameState_Selection(this);
+		break;
+	case(GState::WAITING_ROOM):
+		stateBase = new GameState_WaitingRoom(this);
 		break;
 	case(GState::LEVEL):
 		stateBase = new GameState_Level(this);

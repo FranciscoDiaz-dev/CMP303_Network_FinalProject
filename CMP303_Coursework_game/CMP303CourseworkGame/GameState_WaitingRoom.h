@@ -1,28 +1,29 @@
-// Game State Selection
+// Game State WaitingRoom
 // It is the "real game", where the player/s can play with its/their characters
 // Game State Leve extend Game State Base,
 // Contains the scenery manager, player manager, camera, parallax manager (System movement).
 // @author Francisco Diaz (@FMGameDev)
 
-#ifndef _GAMESTATE_SELECTION_H
-#define _GAMESTATE_SELECTION_H
+#ifndef _GAMESTATE_WAIITNG_ROOM_H
+#define _GAMESTATE_WAIITNG_ROOM_H
 #pragma once
 
 #include "GameStateBase.h"
 #include "GameStateManager.h"
 #include "Tank.h"
-#include "GUI.h"
+#include "EnemiesManager.h"
+#include "..\..\NetworkFramework\ClientConnection.h"
 
 #include <vector>
 
-class GameState_Selection : public GameStateBase
+class GameState_WaitingRoom : public GameStateBase
 {
 public:
 	// Constructor
-	GameState_Selection(GameStateManager* stateMgr);
+	GameState_WaitingRoom(GameStateManager* stateMgr);
 
 	// Destructor
-	~GameState_Selection();
+	~GameState_WaitingRoom();
 
 	// Basic game functions (handleInput, update, render) which are override from Game Sate Base
 
@@ -34,7 +35,7 @@ public:
 	void render() override;
 
 private:
-	// This player object
+	// Players
 	Tank* player;
 	EnemiesManager* enemiesMgr;
 
@@ -43,7 +44,9 @@ private:
 	sf::Text titleText;
 	sf::Text infoText;
 
-	GUI* gui;
+	ClientConnection* clientConnection;
+	GameState* gameState;
+	int* gameId;
 };
 
-#endif //_GAMESTATE_SELECTION_H
+#endif //_GAMESTATE_WAIITNG_ROOM_H

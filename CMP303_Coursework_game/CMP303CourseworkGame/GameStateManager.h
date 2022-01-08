@@ -25,6 +25,7 @@
 // all the game states of this game
 #include "GameState_Level.h"
 #include "GameState_Selection.h"
+#include "GameState_WaitingRoom.h"
 
 // includes for using in the containers
 #include <unordered_map>

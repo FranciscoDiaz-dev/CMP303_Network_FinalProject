@@ -7,7 +7,7 @@
 #pragma once
 
 // Possible states. This enum can be modified to add additional states as required.
-enum class GState { SELECTION, LEVEL, GAME_OVER };
+enum class GState { SELECTION, WAITING_ROOM, LEVEL, GAME_OVER };
 
 class GameState
 {

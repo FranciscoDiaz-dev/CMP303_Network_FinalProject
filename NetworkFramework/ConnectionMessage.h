@@ -3,17 +3,26 @@
 #pragma once
 
 #include <SFML/Network.hpp>
-#include "PlayerInfo.h"
+#include "TankInfo.h"
+#include "RequestType.h"
+#include "..\CMP303_Coursework_game\CMP303CourseworkGame\GameState.h"
+
 
 /** A position update message. */
 struct PlayerMessage
 {
 	// constructor
-	PlayerMessage() : gameId(-1) {}
+	PlayerMessage() : gameId(-1), requestType(int(RequestType::NONE)), gState(int(GState::SELECTION)) {}
 
 	// components
-	int gameId;// identifier of the game this player is from 
-	PlayerInfo playerInfo;// information of the player
+	// Identifier of the game this player is from (if it is -1 means not game has beeen assigned to it yet)
+	// This id will determ the "map/level/background" for this game
+	// It is initialised by the server when a game is created on it.
+	int gameId;
+	int requestType;
+	int gState;
+
+	TankInfo tankInfo;// information of the player
 };
 
 

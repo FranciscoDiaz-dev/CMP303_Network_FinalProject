@@ -11,8 +11,9 @@
 #include <SFML\Graphics.hpp>
 #include <iostream>
 #include "Framework/Input.h"
-#include "../../NetworkFramework/ServersManager.h"
+#include "../../NetworkFramework/ServersListManager.h"
 #include "../../NetworkFramework/ServerConnection.h"
+#include "SharedContext.h"
 #include <Windows.h> // for get the local time
 
 #include "GUI.h"
@@ -87,6 +88,7 @@ void windowProcess(sf::RenderWindow* window, Input* in, GUI* gui, const unsigned
 	}
 }
 
+
 // main game menu
 int main()
 {
@@ -100,25 +102,36 @@ int main()
 	Input input; // imput component used in all the game
 
 	// Declare servers manager
-	ServersManager serversMgr;
-	ServerConnection* serverConnection = nullptr;
-
-	// Declare our ImGui
-	GUI gui(&window, &serversMgr, serverConnection);
-
-	// Initialise objects for delta time
-	sf::Clock gameClock;
-	sf::Time deltaTime;
+	ServersListManager serversMgr;
 
 	// Text
 	sf::Font montserratFont;
 	sf::Text debugText;
 
-	// initialise font and text
+	// Initialise font and text
 	montserratFont.loadFromFile("Assets/Montserrat-Regular.ttf");
 	debugText.setFont(montserratFont);
 	debugText.setOutlineColor(sf::Color::Black);
 	debugText.setOutlineThickness(1.f);
+	debugText.setCharacterSize(20);
+	debugText.setPosition(sf::Vector2f(250.0f, 20.0f));
+
+	// Create SharedContext which it contains all the components we will need in the game states
+	SharedContext sharedContext;
+	sharedContext.kWindowName = &kWindowName;
+	sharedContext.kMinWindowWith = &kMinWindowWith;
+	sharedContext.kMinWindowHeight = &kMinWindowHeight;
+	sharedContext.window = &window;
+	sharedContext.input = &input;
+	sharedContext.serversListMgr = &serversMgr;
+	sharedContext.debugText = &debugText;
+
+	// Declare our ImGui
+	GUI gui(&sharedContext);
+
+	// Initialise objects for delta time
+	sf::Clock gameClock;
+	sf::Time deltaTime;
 
 	// Game Loop
 	while (window.isOpen())
@@ -131,29 +144,30 @@ int main()
 		deltaTime = gameClock.restart();
 
 		// Run Server if it has been initialised
-		if (serverConnection != nullptr)
+		if (sharedContext.serverConnection != nullptr)
 		{
 			// update server data
-			serverConnection->run();
+			sharedContext.serverConnection->run();
+			sharedContext.debugText->setString(sharedContext.serverConnection->getActiveGamesInfo());
 		}
-		// If not run the Menu where the user can select and run a server
-		else
-		{
-			// update the Gui
-			gui.update(deltaTime);
 
-			// Render GUI
-			window.clear(sf::Color(100, 149, 237));
-				gui.render();
-			window.display();
-		}
+		// update the Gui
+		gui.update(deltaTime);
+
+		// Render GUI
+		window.clear(sf::Color(100, 149, 237));
+			if (sharedContext.serverConnection != nullptr)
+				window.draw(debugText);
+			gui.render();
+		window.display();
+
 	}
 
 	// Destroy the server if it has not been destroyed yet
-	if (serverConnection != nullptr)
+	if (sharedContext.serverConnection != nullptr)
 	{
-		delete serverConnection;
-		serverConnection = nullptr;
+		delete sharedContext.serverConnection;
+		sharedContext.serverConnection = nullptr;
 	}
 
 	return 0;

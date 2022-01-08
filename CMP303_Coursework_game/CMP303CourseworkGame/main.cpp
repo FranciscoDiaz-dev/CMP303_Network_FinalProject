@@ -13,10 +13,12 @@
 #include "Framework/Input.h"
 #include "GameStateManager.h"
 #include "NetworkSimulator.h"
-#include "../../NetworkFramework/ServersManager.h"
+#include "../../NetworkFramework/ServersListManager.h"
 #include "../../NetworkFramework/ClientConnection.h"
+#include "EnemiesManager.h"
 #include "Tank.h"
 #include <Windows.h> // for get the local time
+
 
 #include "SharedContext.h"
 #include "GUI.h"
@@ -96,7 +98,7 @@ void windowProcess(sf::RenderWindow* window, Input* in, GUI* gui, const unsigned
 int main()
 {
 	// Create Objects to shared in the game states
-	const sf::String kGameName = "CMP303 - Coursework by Francisco Diaz (1902654)";
+	const sf::String kGameName = "CMP303 - Coursework by Francisco Diaz (1902654) - GAME";
 	const unsigned int kMinWindowWith = 640;
 	const unsigned int kMinWindowHeight = 480;
 	sf::RenderWindow window(sf::VideoMode(kMinWindowWith, kMinWindowHeight), kGameName);
@@ -105,6 +107,7 @@ int main()
 	Input input; // imput component used in all the game
 	GameState gameState; // game state component which contains the current game state
 	Tank player;
+	EnemiesManager enemiesMgr;
 	int gameId = -1;
 
 	//Create a network simulator with that "sends" a message every 0.5 seconds and has a latency of 0.3 seconds
@@ -113,8 +116,8 @@ int main()
 	NetworkSimulator netSimulator(sendRate, latency);
 	netSimulator.m_MyID = 0;	//On the network, we are Tank 0
 
-	ClientConnection clientConnection;
-	ServersManager serversMgr;
+	ClientConnection clientConnection(&player, &gameId, &gameState);
+	ServersListManager serversListMgr;
 
 	// Create SharedContext which it contains all the components we will need in the game states
 	SharedContext sharedContext;
@@ -125,16 +128,17 @@ int main()
 	sharedContext.input = &input;
 	sharedContext.netSimulator = &netSimulator;
 	sharedContext.gameState = &gameState;
-	sharedContext.serversManager = &serversMgr;
+	sharedContext.serversListMgr = &serversListMgr;
 	sharedContext.player = &player;
+	sharedContext.enemiesMgr = &enemiesMgr;
 	sharedContext.gameId = &gameId;
 	sharedContext.clientConnection = &clientConnection;
 
 	// Initilise GameStateManager 
-	GameStateManager gameStateManager(&sharedContext);
+	GameStateManager gameStateMgr(&sharedContext);
 
 	// Set initial game state
-	gameStateManager.switchTo(GState::SELECTION);
+	gameStateMgr.switchTo(GState::SELECTION);
 
 	// Initialise objects for delta time
 	sf::Clock gameClock;
@@ -151,13 +155,13 @@ int main()
 		deltaTime = gameClock.restart();
 		
 		// Call standard game loop functions (input, update and render)
-		gameStateManager.handleInput(deltaTime);	
-		gameStateManager.update(deltaTime);
-		gameStateManager.render();
+		gameStateMgr.handleInput(deltaTime);	
+		gameStateMgr.update(deltaTime);
+		gameStateMgr.render();
 
 		// process all the resquest asked
 		// this method will remove the game states objects requested to be removed
-		gameStateManager.processRequests();
+		gameStateMgr.processRequests();
 	}
 
 	return 0;

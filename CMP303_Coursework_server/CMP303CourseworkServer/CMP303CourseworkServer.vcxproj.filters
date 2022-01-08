@@ -87,14 +87,17 @@
     <ClCompile Include="..\..\NetworkFramework\ConnectionMessage.cpp">
       <Filter>NetworkFramework</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\NetworkFramework\PlayerInfo.cpp">
-      <Filter>NetworkFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\NetworkFramework\ServersManager.cpp">
+    <ClCompile Include="..\..\NetworkFramework\ServersListManager.cpp">
       <Filter>NetworkFramework</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Database\UtilsDataBase.cpp">
       <Filter>DataBase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\NetworkFramework\TankInfo.cpp">
+      <Filter>NetworkFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\NetworkFramework\RequestType.cpp">
+      <Filter>NetworkFramework</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -131,20 +134,26 @@
     <ClInclude Include="..\..\NetworkFramework\ServerInfo.h">
       <Filter>NetworkFramework</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NetworkFramework\PlayerInfo.h">
-      <Filter>NetworkFramework</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\NetworkFramework\SockAddr.h">
       <Filter>NetworkFramework</Filter>
     </ClInclude>
     <ClInclude Include="..\..\NetworkFramework\GameInfo.h">
       <Filter>NetworkFramework</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NetworkFramework\ServersManager.h">
+    <ClInclude Include="..\..\NetworkFramework\ServersListManager.h">
       <Filter>NetworkFramework</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Database\UtilsDataBase.h">
       <Filter>DataBase</Filter>
+    </ClInclude>
+    <ClInclude Include="SharedContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NetworkFramework\TankInfo.h">
+      <Filter>NetworkFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NetworkFramework\RequestType.h">
+      <Filter>NetworkFramework</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

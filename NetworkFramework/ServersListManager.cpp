@@ -1,26 +1,27 @@
-#include "ServersManager.h"
+#include "ServersListManager.h"
 #include "../Database/UtilsDataBase.h"
 #include "SockAddr.h"
 
 #include <sstream>
+#include "ServersListManager.h"
 
 using std::istringstream;
 using std::stringstream;
 using std::fstream;
 using std::getline;
 
-ServersManager::ServersManager()
+ServersListManager::ServersListManager()
 {
     string dataBasePath = "../../DataBase/servers_addresses.csv";
 
     saveAddresses(dataBasePath);
 }
 
-ServersManager::~ServersManager()
+ServersListManager::~ServersListManager()
 {
 }
 
-void ServersManager::saveAddresses(const std::string& dataBasePath)
+void ServersListManager::saveAddresses(const std::string& dataBasePath)
 {
     // Read the text and get its text
     string fileText = UtilsDataBase::getTextFromFile(dataBasePath);
@@ -35,7 +36,8 @@ void ServersManager::saveAddresses(const std::string& dataBasePath)
     string serverID; // (short name)
     string serverName; // (full name)
     string serverAddress;  
-    string serverPort;
+    string serverUDPPort;
+    string serverTCPListenerPort;
 
     // for knowing what
     int rowNum = 0;
@@ -54,12 +56,14 @@ void ServersManager::saveAddresses(const std::string& dataBasePath)
             std::getline(ssRow, serverID, delimiter);
             std::getline(ssRow, serverName, delimiter);
             std::getline(ssRow, serverAddress, delimiter);
-            std::getline(ssRow, serverPort, delimiter);
+            std::getline(ssRow, serverUDPPort, delimiter);
+            std::getline(ssRow, serverTCPListenerPort, delimiter);
 
             // save in the array the server address linked to the server id as a key
             infoServers[serverID].name = serverName;
-            infoServers[serverID].sockAddr.ipAddr = sf::IpAddress(serverAddress);
-            infoServers[serverID].sockAddr.port = stoi(serverPort);
+            infoServers[serverID].ipAddr = sf::IpAddress(serverAddress);
+            infoServers[serverID].udpPort = stoi(serverUDPPort);
+            infoServers[serverID].tcpListenerPort = stoi(serverTCPListenerPort);
         }
 
         // count the row
@@ -67,7 +71,7 @@ void ServersManager::saveAddresses(const std::string& dataBasePath)
     }
 }
 
-std::vector<string> ServersManager::getServersList()
+std::vector<string> ServersListManager::getServersList()
 {
     // create a list of servers with all the servers name
     vector<string> servers;
@@ -77,7 +81,7 @@ std::vector<string> ServersManager::getServersList()
     return servers;
 }
 
-ServerInfo ServersManager::getServerInfoById(string serverId) const
+ServerInfo ServersListManager::getServerInfoById(string serverId) const
 {
     auto server = infoServers.find(serverId);
     if (server != infoServers.end())
@@ -88,11 +92,4 @@ ServerInfo ServersManager::getServerInfoById(string serverId) const
     {
         return ServerInfo();
     }
-}
-
-
-// select the server to use for this game
-void ServersManager::selectServer(string serverId)
-{
-    selectedServerInfo = getServerInfoById(serverId);
 }

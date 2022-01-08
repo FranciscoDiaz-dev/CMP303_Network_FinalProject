@@ -3,26 +3,48 @@
 
 
 ServerConnection::ServerConnection(string serverIdentifier, ServerInfo& serverInfo)
-	: serverId(serverIdentifier), maxNumPlayersPerGame(2), maxNumGames(2), ConnectionBase()
+	: serverId(serverIdentifier), maxNumPlayersPerGame(4), maxNumGames(2), ConnectionBase()
 {
-	// bind the socket to the ip iddress and the port
-	if (udpSocket.bind(serverInfo.sockAddr.port, serverInfo.sockAddr.ipAddr) != sf::Socket::Done)
+	// bind the UDP socket to the ip iddress and the udp port
+	if (udpSocket.bind(serverInfo.udpPort, serverInfo.ipAddr) != sf::Socket::Done)
 	{
-		printf("Server socket bound failed to address %s, port %d\n", serverInfo.sockAddr.ipAddr.toString().c_str(), serverInfo.sockAddr.port);
+		printf("Server UDP socket bound failed to address:%s, port:%d\n", serverInfo.ipAddr.toString().c_str(), serverInfo.udpPort);
 		isRunning = false;
 	}
 	else
 	{
-		// ntohs does the opposite of htons.
-		printf("Server socket bound to address %s, port %d\n", serverInfo.sockAddr.ipAddr.toString().c_str(), serverInfo.sockAddr.port);
+		printf("Server UDP socket bound to address:%s, port:%d\n", serverInfo.ipAddr.toString().c_str(), serverInfo.udpPort);
 		isRunning = true;
 	}
+
+	// Set TCP listener listen to the ip iddress and the tcp listener port
+	if (tcpListener.listen(serverInfo.tcpListenerPort, serverInfo.ipAddr) != sf::Socket::Done)
+	{
+		printf("Server TCP listener failed on listening to address: %s, port:%d\n", serverInfo.ipAddr.toString().c_str(), serverInfo.tcpListenerPort);
+		isRunning = false;
+	}
+	else
+	{
+		printf("Server TCP Listener is listening to address:%s, port:%d\n", serverInfo.ipAddr.toString().c_str(), serverInfo.tcpListenerPort);
+		// Add the listener to the selector
+		selector.add(tcpListener);
+
+		isRunning = true;
+	}
+
 }
 
 ServerConnection::~ServerConnection()
 {
 	for (GameInfo* gameInfo : activeGames)
 	{
+		// delete all the player Data
+		for (std::pair<SockAddr, TankInfo>* playerData : gameInfo->playersData)
+		{
+			delete playerData;
+			playerData = nullptr;
+		}
+		// delete the game
 		delete gameInfo;
 		gameInfo = nullptr;
 	}
@@ -30,6 +52,12 @@ ServerConnection::~ServerConnection()
 
 void ServerConnection::run()
 {
+	// For player requests such as joining a game, leaving a game or wining
+	acceptNewConnection(sf::microseconds(1.0f));
+
+
+	// For player position updates etc:
+
 	// create a socket address where we will save the data of the socket we receive the message
 	// as we want to send a message back to them
 	 SockAddr fromSockAddr;
@@ -40,160 +68,117 @@ void ServerConnection::run()
 	 bool msgReceived = udpReceiveMessage(&packetReceived, &fromSockAddr);
 	 packetReceived >> receivedPlayerMsg;
 
-	 /* Detect what type of message is*/
-
-	 // Type 1: //
-	 // A player who want to join to a game
-	 // it will return a gameId equals to -1 (none game was assigned to them)
-	 // The server needs to find a game for it if it is possible, if not it will return 
-	 if (msgReceived && receivedPlayerMsg.gameId == -1)
-	 {
-
-		 printf("Processing request: Join a new game.\n");
-
-		 // There are different results for this request.
-		 // Option 1: There are active games which can host a new player
-		 if (int(activeGames.size()) > 0 && getAGameIdCanHost() != -1)
-		 {
-			 printf("Option 1: There are a active game can host.");
-
-			 // Add this new player to a game which is waiting for players
-			 // get the game is waiting
-			 GameInfo* hostGame = activeGames.at(getAGameIdCanHost()); // get the game which can host
-			 // create the player
-			 addNewPlayer(hostGame, fromSockAddr, receivedPlayerMsg.playerInfo); // add this player to that game
-
-			 // update the received message player with the game id assigned and their player id
-			 receivedPlayerMsg.gameId = hostGame->id;
-			 receivedPlayerMsg.playerInfo.id = hostGame->playersInfo.back().id; // last player id added
-		 }
-		 // Option 2: There are not active games which can host a new player
-		 // however the server CAN host a new game
-		 else if (int(activeGames.size()) < maxNumGames)
-		 {
-			 printf("Option 2: There aren't any active game can host, however the server can create a new game.");
-
-			 // Add this player to a new game
-			 // create the new game.
-			 // the id of the game will be the index position of the vector container
-			 activeGames.push_back(new GameInfo());
-			 activeGames.back()->id = int(activeGames.size() -1);
-
-			 // create a new player info to that last game created
-			 addNewPlayer(activeGames.back(), fromSockAddr, receivedPlayerMsg.playerInfo);
-
-			 // update the received message player with the game id assigned and their player id
-			 receivedPlayerMsg.gameId = activeGames.back()->id;
-			 receivedPlayerMsg.playerInfo.id = activeGames.back()->playersInfo.back().id; // last player id added
-		 }
-		 // Option 2: There are not active games which can host a new player
-		 // and the server CANNOT host a new game
-		 else
-		 {
-			 printf("Option 3: There aren't any active game can host.");
-		 }
-
-		 // sent message with the game and player ids assigned
-		 sf::Packet packetSent;
-		 packetSent << receivedPlayerMsg;
-		 udpSendMessage(packetSent, fromSockAddr);
-
-		 // Wait for confirmation that the player has received their new id
-		 // if the confirmation has not been received them remove the player from the game created
-		 sf::Packet packetConfirmation;
-		 udpReceiveMessage(&packetConfirmation, &fromSockAddr);
-		 packetConfirmation >> receivedPlayerMsg;
-
-		 if (receivedPlayerMsg.gameId == -1)
-		 {
-			 printf("The player did not receive the message.\n");
-		 }
-
-	 }
 	 // Type 2: //
-	 // A Player who is currently in a game
-	 //
-	 else if (msgReceived)
+	 if (msgReceived && receivedPlayerMsg.requestType == int(RequestType::UPDATE))
 	 {
-		 GameInfo* gameInfo = getGameInfoById(receivedPlayerMsg.gameId);
-
+		 // Get the game info where the player is
+		 GameInfo* gameInfo = findGameInfoById(receivedPlayerMsg.gameId);
+		 
+		 // If the game has been found:
 		 if (gameInfo != nullptr)
 		 {
-			 // update the player info in the servers if the time in which this information
-			 // was sent is later than the one we currently have
-			 if (gameInfo->playersInfo.at(receivedPlayerMsg.playerInfo.id).time < receivedPlayerMsg.playerInfo.time)
-			 {
-				 gameInfo->playersInfo.at(receivedPlayerMsg.playerInfo.id) = receivedPlayerMsg.playerInfo;
-			 }
+			 PlayerData* playerData = findPlayerDataById(gameInfo, receivedPlayerMsg.gameId);
 
-			 // Send to the rest of the players the most updated information of this player
-			 for (int i = 0; i < int(gameInfo->playersSockAddr.size()); i++)
+			 if (playerData != nullptr)
 			 {
-				 if (i != receivedPlayerMsg.playerInfo.id)
+				 // update the player info in the servers if the time in which this information
+				 // was sent is later than the one we currently have
+				 //if (gameInfo->playersInfo.at(receivedPlayerMsg.tankInfo.id).time < receivedPlayerMsg.tankInfo.time)
+				 //{
+					 // update player information on the server
+				 playerData->second = receivedPlayerMsg.tankInfo;
+				 playerData->first = fromSockAddr;
+
+				 // Send the most updated version of all the players to every player 
+				 for (PlayerData* toPlayerData : gameInfo->playersData)
 				 {
-					 sf::Packet packetSent2;
-					 packetSent2 << receivedPlayerMsg;
-					 udpSendMessage(packetSent2, gameInfo->playersSockAddr.at(i));
+					 sf::Packet packetToPlayer;
+
+					 // Convert all the data to sf::Packet
+					 for (PlayerData* playerData : gameInfo->playersData)
+					 {
+						 packetToPlayer << playerData->second;
+					 }
+
+					 // send message
+					 udpSendMessage(packetToPlayer, toPlayerData->first);
 				 }
-			 }
-		 }
-		 else
-		 {
-			 // This game does not exict any more --> 
+			 }		
 		 }
 	 }
-
-	// Step 2: //
-	// Listen for players which are currently in a active game
-	if (int(activeGames.size()) > 0)
-	{
-		// receive the message of player x
-		//PlayerMessage player_msg = receiveMessage<PlayerMessage>(&from_to_sock_addr);
-
-		// Update the player information using the game id and player id received
-		//activeGames[player_msg.gameId].playersInfo.at(player_msg.playerInfo.id) = player_msg.playerInfo;
-		
-	}
-
-
-	// The server first need to receive a message
-	//PlayerMessage player_msg0 = receiveMessage<PlayerMessage>(&from_to_sock_addr);
-
-	// After that send back the message to the sender
-	//bool sent = sendMessage<PlayerMessage>(player_msg0, inet_ntoa(from_to_sock_addr.sin_addr), ntohs(from_to_sock_addr.sin_port));
-
 }
 
-void ServerConnection::addNewPlayer(GameInfo* gameInfo, SockAddr playerSockAddr, PlayerInfo newPlayerInfo)
+string ServerConnection::getActiveGamesInfo()
+{
+	string activeGamesInfo;
+
+	activeGamesInfo += "Active Games: " + std::to_string(activeGames.size()) + "\n";
+
+	if (!activeGames.empty())
+	{
+		for (GameInfo* gameInfo : activeGames)
+		{
+			activeGamesInfo += "Game ID: " + std::to_string(gameInfo->id) + "\n";
+
+			for (std::pair<SockAddr, TankInfo>* playerData : gameInfo->playersData)
+			{
+				activeGamesInfo += " - Player ID: " + std::to_string(playerData->second.id) + "\n";
+			}
+		}
+	}
+
+	return activeGamesInfo;
+}
+
+PlayerData* ServerConnection::createPlayerData(GameInfo* hostGame, TankInfo& newTankInfo)
 {
 	// Step 1:
 	// Create Player Id
 	// The current number of players will be the player id
 	// for example: if there are not player (numPlayers == 0)
 	// then the first player id of this game will be 0
-	newPlayerInfo.id = gameInfo->numPlayers;
+	newTankInfo.id = int(hostGame->playersData.size());
 
 	// Step 2:
-	// Add player info to the collection of that game
-	// The id of this player will be equal to index of this collection where the info of the player is saved
-	gameInfo->playersInfo.push_back(newPlayerInfo);
-
-	// Step 3:
-	// Add player sock address to the collection so the server can communicate to them later on
-	// The id of this player will be equal to index of this collection where the address of the player is saved
-	gameInfo->playersSockAddr.push_back(playerSockAddr);
+	// Set initial player posity by its id
+	switch (newTankInfo.id)
+	{
+	case 0:
+		newTankInfo.x = 40.0f;
+		newTankInfo.y = 40.0f;
+		break;
+	case 1:
+		newTankInfo.x = 40.0f;
+		newTankInfo.y = 70.0f;
+		break;
+	case 3:
+		newTankInfo.x = 40.0f;
+		newTankInfo.y = 100.0f;
+		break;
+	case 4:
+		newTankInfo.x = 40.0f;
+		newTankInfo.y = 140.0f;
+		break;
+	}
+	// Step 2:
+	// Add player info to the collection of that game and their socket address
+	//hostGame->playersData.push_back();
 
 	// Step 4:
 	// Add the player to the game counter
-	gameInfo->numPlayers++;
+	//hostGame->numPlayers++;
+
+	// return the last player added
+	return new PlayerData(SockAddr(), newTankInfo);
 }
+
 
 int ServerConnection::getAGameIdCanHost()
 {
 	for (int i = 0; i < int(activeGames.size()); i++)
 	{
 		// check if that game can host a new player
-		if (activeGames.at(i)->numPlayers < maxNumGames)
+		if (activeGames.at(i)->numPlayers < maxNumPlayersPerGame)
 			return i;
 	}
 
@@ -201,7 +186,7 @@ int ServerConnection::getAGameIdCanHost()
 	return -1;
 }
 
-GameInfo* ServerConnection::getGameInfoById(int id)
+GameInfo* ServerConnection::findGameInfoById(int id)
 {
 	// find the game where the player who sent the message is playing
 	for (GameInfo* gameInfo : activeGames)
@@ -213,4 +198,164 @@ GameInfo* ServerConnection::getGameInfoById(int id)
 	}
 
 	return nullptr;
+}
+
+PlayerData* ServerConnection::findPlayerDataById(GameInfo* gameInfo, int playerId)
+{
+	if (gameInfo == nullptr)
+		return nullptr;
+
+	// find the game where the player who sent the message is playing
+	for (PlayerData* playerData : gameInfo->playersData)
+	{
+		if (playerData->second.id == playerId)
+		{
+			return playerData;
+		}
+	}
+
+	return nullptr;
+}
+
+GameInfo* ServerConnection::createNewGame()
+{
+	// creta egame info object
+	GameInfo* gameInfo = new GameInfo();
+
+	return gameInfo;
+}
+
+void ServerConnection::acceptNewConnection(sf::Time timeout)
+{
+
+	// Make the selector wait for data on any socket
+	if (selector.wait(timeout))
+	{
+		// Test the listener
+		if (selector.isReady(tcpListener))
+		{
+			// The listener is ready: there is a client which wants to connect
+			sf::TcpSocket* client = new sf::TcpSocket;
+			if (tcpListener.accept(*client) == sf::Socket::Done)
+			{
+				// Add the new client to the clients list
+				clients.push_back(client);
+				// Add the new client to the selector so that we will
+				// be notified when he sends something
+				selector.add(*client);
+
+				printf("Client Connected address:%s and port:%d.\n", client->getRemoteAddress().toString(), client->getLocalPort());
+			}
+			else
+			{
+				// Error, we won't get a new connection, delete the socket
+				delete client;
+			}
+		}
+		else
+		{
+			// The listener socket is not ready, test all other sockets (the clients)
+			for (std::list<sf::TcpSocket*>::iterator it = clients.begin(); it != clients.end(); ++it)
+			{
+				sf::TcpSocket& client = **it;
+				if (selector.isReady(client))
+				{
+					// The client has sent some data, we can receive it
+					sf::Packet receivedPacket;
+					if (tcpReceiveMessage(&receivedPacket, client))
+					{
+						printf("Message received from address:%s and port:%d.\n", client.getRemoteAddress().toString(), client.getLocalPort());
+
+						PlayerMessage playerMessage;
+						// transform the packet received to player message structure
+						receivedPacket >> playerMessage;
+
+						/* Detect what the player wants */
+
+						if(playerMessage.requestType == int(RequestType::JOIN))
+						{
+							printf("Processing request: Join a new game.\n");
+
+							// create objects where the information related with this player will be saved
+							PlayerData* newPlayerData = nullptr;
+							GameInfo* hostGame = nullptr;
+
+							// There are different results/option for this request:
+							// 
+							// OPTION 1: There are active games which can host a new player
+							if (int(activeGames.size()) > 0 && getAGameIdCanHost() != -1)
+							{
+								printf("Option 1: There are a active game can host.");
+
+								// Add this new player to a game which is waiting for players
+								// get the game is waiting
+								hostGame = activeGames.at(getAGameIdCanHost()); // get the game which can host
+							}
+							// OPTION 2: There are not active games which can host a new player
+							// however the server CAN host a new game
+							else if (int(activeGames.size()) < maxNumGames)
+							{
+								printf("Option 2: There aren't any active game can host, however the server can create a new game.");
+
+								// Add this player to a new game
+								// create the new game.
+								// the id of the game will be the index position of the vector container
+								hostGame = new GameInfo();
+								hostGame->id = int(activeGames.size());
+								activeGames.push_back(hostGame);
+							}
+							// Option 2: There are not active games which can host a new player
+							// and the server CANNOT host a new game
+							else
+							{
+								printf("Option 3: There aren't any active game can host.");
+							}
+
+							// create a new player info
+							newPlayerData = createPlayerData(hostGame, playerMessage.tankInfo);
+
+							// update the received message player with the game id assigned and their player id
+							PlayerMessage toPlayerMessage;
+							toPlayerMessage.gameId = hostGame->id;
+							toPlayerMessage.gState = int(GState::WAITING_ROOM);
+							toPlayerMessage.tankInfo = newPlayerData->second;
+
+							sf::Packet sentPacket;
+							sentPacket << toPlayerMessage;
+
+							if (tcpSendMessage(sentPacket, &client))
+							{
+								printf("The player did receive the message.\n");
+								hostGame->playersData.push_back(newPlayerData);
+								hostGame->numPlayers += 1;
+							}
+							else
+							{
+								printf("The player did not receive the message aparently, so delet it.\n");
+								delete newPlayerData;
+								newPlayerData = nullptr;
+							}
+						}
+						else if (playerMessage.requestType == int(RequestType::EXIST))
+						{
+							printf("Processing request: Exist the game.\n");
+
+							// create objects where the information related with this player will be saved
+							GameInfo* gameInfo = findGameInfoById(playerMessage.gameId);
+							PlayerData* playerData = findPlayerDataById(gameInfo, playerMessage.tankInfo.id);
+
+							auto removeIt = std::find(gameInfo->playersData.begin(), gameInfo->playersData.end(), playerData);
+							if (removeIt != gameInfo->playersData.end())
+							{
+								gameInfo->playersData.erase(removeIt);
+								gameInfo->numPlayers--;
+							}
+						}
+						
+					}
+					
+				}
+			}
+		}
+	}
 }

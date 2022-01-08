@@ -11,9 +11,8 @@
 #include "GameStateBase.h"
 #include "GameStateManager.h"
 #include "Tank.h"
-#include "GUI.h"
+#include "EnemiesManager.h"
 #include "..\..\NetworkFramework\ClientConnection.h"
-#include "..\..\NetworkFramework\ServersManager.h"
 
 #include <vector>
 
@@ -42,8 +41,8 @@ private:
 	void goToGameOver();
 
 	// Players
-	std::vector<Tank*> enemies;
 	Tank* player;
+	EnemiesManager* enemiesMgr;
 
 	// Floor
 	sf::Texture floorTexture;
@@ -53,9 +52,7 @@ private:
 	sf::Font montserratFont;
 	sf::Text debugText;
 
-	GUI* gui;
 	ClientConnection* clientConnection;
-	ServersManager* serversMgr;
 	int* gameId;
 };
 

@@ -3,8 +3,7 @@
 
 Tank::Tank() : sf::Sprite()
 {
-	SetColour("Red");
-	m_PlayerInfo.id = 0;
+	//Reset();
 }
 
 
@@ -13,123 +12,70 @@ Tank::~Tank()
 }
 
 
+void Tank::HandleInput(float dt)
+{
+}
+
 void Tank::Update(float dt)
 {
-	if (m_Messages.size() < 1)
-		return;
-	PlayerInfo latestMessage = m_Messages.back();
-	setPosition(latestMessage.x, latestMessage.y);
 }
 
-void Tank::setPosition(float x, float y)
+void Tank::Render(sf::RenderWindow* window)
 {
-	// set position of the body sprite
-	sf::Sprite::setPosition(x, y);
-	// set position of the barrel sprite
-	m_BarrelSprite.setPosition(getPosition());
-	// save position in the player info struc
-	m_PlayerInfo.x = x;
-	m_PlayerInfo.y = y;
-	m_PlayerInfo.time = 1.0f; // TODO: MOVE TO ANOTHER PLACE
+	window->draw(*this);
+	window->draw(m_BarrelSprite);
 }
 
 
-void Tank::setGhostPosition(sf::Vector2f pos) {
-	m_GhostSprite.setPosition(pos);
+void Tank::setTankInfo(TankInfo newTankInfo)
+{
+	// Check if this tank had another texture/colour
+	// if so then update it
+	if (m_TankInfo.colour != newTankInfo.colour)
+	{
+		SetTexture(newTankInfo.colour);
+	}
+
+	// Set Position
+	SetPosition(sf::Vector2f(newTankInfo.x, newTankInfo.y));
+
+	// update the full tank info
+	m_TankInfo = newTankInfo;
 }
 
-void Tank::SetColour(std::string colour)
+void Tank::SetTexture(std::string colour)
 {
 	// save player colour
-	m_PlayerInfo.colour = colour;
+	m_TankInfo.colour = colour;
 
-	// Change texture
-	m_BodyTexture.loadFromFile("Assets/" + m_PlayerInfo.colour + "Tank.png");
-	m_BarrelTexture.loadFromFile("Assets/" + m_PlayerInfo.colour + "Barrel.png");
-	setTexture(m_BodyTexture);
+	// Change Body texture
+	m_BodyTexture.loadFromFile("Assets/" + m_TankInfo.colour + "Tank.png");
+	m_BarrelTexture.loadFromFile("Assets/" + m_TankInfo.colour + "Barrel.png");
+	sf::Sprite::setTexture(m_BodyTexture);
+	sf::Sprite::setOrigin(getTextureRect().width / 2, getTextureRect().height / 2);
 
-	setOrigin(getTextureRect().width / 2, getTextureRect().height / 2);
-
-	m_GhostSprite.setTexture(m_BodyTexture);
-	m_GhostSprite.setColor(sf::Color(255, 255, 255, 128));
-	m_GhostSprite.setOrigin(getTextureRect().width / 2, getTextureRect().height / 2);
-	setGhostPosition(getPosition());
-
+	// Change Barrel Texture
 	m_BarrelSprite.setTexture(m_BarrelTexture);
 	m_BarrelSprite.setOrigin(6, 2);
-	m_BarrelSprite.setPosition(getPosition());
+	m_BarrelSprite.setPosition(sf::Sprite::getPosition());
 }
 
-const void Tank::Render(sf::RenderWindow* window) {
-	if ((int)m_RenderMode > 0)
-	{
-		window->draw(m_GhostSprite);
-	}
-	if ((int)m_RenderMode != 1) {
-		window->draw(*this);
-		window->draw(m_BarrelSprite);
-	}
-}
-
-
-void Tank::AddMessage(const PlayerInfo& msg)
+void Tank::Reset()
 {
-	m_Messages.push_back(msg);
+	// Set a new player info
+	setTankInfo(TankInfo());
 }
 
+void Tank::SetPosition(sf::Vector2f pos)
+{
+	// set position of the body sprite
+	sf::Sprite::setPosition(pos.x, pos.y);
 
-sf::Vector2f Tank::RunPrediction(float gameTime) {
-	float predictedX = -1.0f;
-	float predictedY = -1.0f;
+	// set position of the barrel sprite
+	m_BarrelSprite.setPosition(sf::Sprite::getPosition());
 
-	const int msize = m_Messages.size();
-	if (msize < 3) {
-		return sf::Vector2f(predictedX, predictedX);
-	}
-	const PlayerInfo& msg0 = m_Messages[msize - 1];
-	const PlayerInfo& msg1 = m_Messages[msize - 2];
-	const PlayerInfo& msg2 = m_Messages[msize - 3];
-
-	// FIXME: Implement prediction here!
-	// You have:
-	// - the history of position messages received, in "m_Messages"
-	//   (msg0 is the most recent, msg1 the 2nd most recent, msg2 the 3rd most recent)
-	// - the current time, in "gameTime"
-	//
-	// You need to update:
-	// - the predicted position at the current time, in "predictedX" and "predictedY"
-
-	// Using the lastest message received (not prediction)
-	//predictedX = msg0.x;
-	//predictedY = msg0.y;
-
-	// Linear Prediction (it uses the last two known positions to extrapolate the next position)
-	// Next position = previous real position + displacement
-	// Displacemenent = speed * time(since last message)
-	// Speed = (distance between the last two position)/ (time between the last two positions)
-	sf::Vector2f speedL = (sf::Vector2f(msg0.x, msg0.y) - sf::Vector2f(msg1.x, msg1.y)) / (msg0.time - msg1.time);
-	sf::Vector2f displacementL = speedL * (gameTime - msg0.time);
-	sf::Vector2f nextPosL = getPosition() + displacementL;
-	predictedX = nextPosL.x;
-	predictedY = nextPosL.y;
-
-	// Quadratic Prediction ( it uses the three last known positions to extrapolate the next position)
-	// S = ut + 0.5*a*t^2
-	// Next position = previous real position + displacement
-	// Displacement = speed(at last message) * time(since last message) + 0.5 * acceleration * time^2
-	// Speed = distance between the last two positions/ time between last two position.
-	// Acceleration = difference in speed at the last two positions / time between those positions.
-	sf::Vector2f speed0Q = (sf::Vector2f(msg0.x, msg0.y) - sf::Vector2f(msg1.x, msg1.y)) / (msg0.time - msg1.time);
-	sf::Vector2f speed1Q = (sf::Vector2f(msg1.x, msg1.y) - sf::Vector2f(msg2.x, msg2.y)) / (msg1.time - msg2.time);
-	sf::Vector2f accelerationQ = (speed1Q - speed0Q) / (msg0.time - msg1.time);
-	sf::Vector2f displacementQ = (speed0Q * (gameTime - msg0.time)) + (0.5f * accelerationQ * powf((gameTime - msg0.time), 2.0f));
-	sf::Vector2f nextPosQ = getPosition() + displacementQ;
-	predictedX = nextPosQ.x;
-	predictedY = nextPosQ.y;
-
-	return sf::Vector2f(predictedX, predictedY);
-}
-
-void Tank::Reset() {
-	m_Messages.clear();
+	// save position in the player info struc
+	m_TankInfo.x = pos.x;
+	m_TankInfo.y = pos.y;
+	m_TankInfo.time = 1.0f; // TODO: MOVE TO ANOTHER PLACE
 }

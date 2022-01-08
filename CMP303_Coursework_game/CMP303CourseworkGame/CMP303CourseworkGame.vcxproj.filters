@@ -102,14 +102,26 @@
     <ClCompile Include="..\..\NetworkFramework\ConnectionMessage.cpp">
       <Filter>NetworkFramework</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\NetworkFramework\PlayerInfo.cpp">
+    <ClCompile Include="..\..\NetworkFramework\TankInfo.cpp">
       <Filter>NetworkFramework</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\NetworkFramework\ServersManager.cpp">
+    <ClCompile Include="..\..\NetworkFramework\ServersListManager.cpp">
       <Filter>NetworkFramework</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Database\UtilsDataBase.cpp">
       <Filter>DataBase</Filter>
+    </ClCompile>
+    <ClCompile Include="Enemy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemiesManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameState_WaitingRoom.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\NetworkFramework\RequestType.cpp">
+      <Filter>NetworkFramework</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -158,7 +170,7 @@
     <ClInclude Include="..\..\NetworkFramework\GameInfo.h">
       <Filter>NetworkFramework</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NetworkFramework\PlayerInfo.h">
+    <ClInclude Include="..\..\NetworkFramework\TankInfo.h">
       <Filter>NetworkFramework</Filter>
     </ClInclude>
     <ClInclude Include="..\..\NetworkFramework\ServerInfo.h">
@@ -170,7 +182,7 @@
     <ClInclude Include="..\..\NetworkFramework\ClientConnection.h">
       <Filter>NetworkFramework</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NetworkFramework\ServersManager.h">
+    <ClInclude Include="..\..\NetworkFramework\ServersListManager.h">
       <Filter>NetworkFramework</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Database\UtilsDataBase.h">
@@ -178,6 +190,18 @@
     </ClInclude>
     <ClInclude Include="Tank.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemiesManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameState_WaitingRoom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NetworkFramework\RequestType.h">
+      <Filter>NetworkFramework</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

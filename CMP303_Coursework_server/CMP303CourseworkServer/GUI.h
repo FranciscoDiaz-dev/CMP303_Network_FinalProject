@@ -6,9 +6,9 @@
 #include <string>
 #include <SFML\Graphics.hpp>
 
-#include "../../NetworkFramework/ServerInfo.h"
+#include "SharedContext.h"
 
-class ServersManager;
+class ServersListManager;
 class ServerConnection;
 
 
@@ -20,7 +20,7 @@ class GUI
 
 public:
 	// constructor
-	GUI(sf::RenderWindow* wnd, ServersManager* serversMgr, ServerConnection* serverConn);
+	GUI(SharedContext* sharedCtxt);
 
 	// destructor
 	~GUI();
@@ -34,10 +34,10 @@ public:
 
 
 private:
-	sf::RenderWindow* window;
 
-	ServersManager* serversManager;
-	ServerConnection* serverConnection;
+	sf::RenderWindow* window;
+	ServersListManager* serversListMgr;
+	SharedContext* sharedContext;
 
 	// servers available
 	vector<string> servers;

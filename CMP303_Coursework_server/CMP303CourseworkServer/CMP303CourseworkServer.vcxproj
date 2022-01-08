@@ -22,9 +22,10 @@
     <ClCompile Include="..\..\Database\UtilsDataBase.cpp" />
     <ClCompile Include="..\..\NetworkFramework\ConnectionBase.cpp" />
     <ClCompile Include="..\..\NetworkFramework\ConnectionMessage.cpp" />
-    <ClCompile Include="..\..\NetworkFramework\PlayerInfo.cpp" />
+    <ClCompile Include="..\..\NetworkFramework\RequestType.cpp" />
     <ClCompile Include="..\..\NetworkFramework\ServerConnection.cpp" />
-    <ClCompile Include="..\..\NetworkFramework\ServersManager.cpp" />
+    <ClCompile Include="..\..\NetworkFramework\ServersListManager.cpp" />
+    <ClCompile Include="..\..\NetworkFramework\TankInfo.cpp" />
     <ClCompile Include="Framework\Input.cpp" />
     <ClCompile Include="Framework\Vector.cpp" />
     <ClCompile Include="GameState.cpp" />
@@ -44,17 +45,19 @@
     <ClInclude Include="..\..\NetworkFramework\ConnectionBase.h" />
     <ClInclude Include="..\..\NetworkFramework\ConnectionMessage.h" />
     <ClInclude Include="..\..\NetworkFramework\GameInfo.h" />
-    <ClInclude Include="..\..\NetworkFramework\PlayerInfo.h" />
+    <ClInclude Include="..\..\NetworkFramework\RequestType.h" />
     <ClInclude Include="..\..\NetworkFramework\ServerConnection.h" />
     <ClInclude Include="..\..\NetworkFramework\ServerInfo.h" />
-    <ClInclude Include="..\..\NetworkFramework\ServersManager.h" />
+    <ClInclude Include="..\..\NetworkFramework\ServersListManager.h" />
     <ClInclude Include="..\..\NetworkFramework\SockAddr.h" />
+    <ClInclude Include="..\..\NetworkFramework\TankInfo.h" />
     <ClInclude Include="Framework\Input.h" />
     <ClInclude Include="Framework\Vector.h" />
     <ClInclude Include="GameState.h" />
     <ClInclude Include="GUI.h" />
     <ClInclude Include="ImGUI-master\ImGUI-SFML\imgui-SFML.h" />
     <ClInclude Include="ImGUI-master\ImGUI\imgui.h" />
+    <ClInclude Include="SharedContext.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>

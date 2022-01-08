@@ -8,7 +8,8 @@
 
 class SharedContext;
 class GameStateManager;
-class ServersManager;
+class ServersListManager;
+class GameState;
 class Tank;
 class ClientConnection;
 
@@ -33,21 +34,28 @@ public:
 	// render
 	void render();
 
+	// return the selected server index
+	int getSelectedServerIndex() { return selectedServerIndex; };
+
 private:	
 	GameStateManager* gameStateMgr;
 	sf::RenderWindow* window;
-	ServersManager* serversMgr;
+	ServersListManager* serversListMgr;
 	ClientConnection* clientConnection;
 	Tank* player;
+	GameState* gameState;
 	int* gameId;
 
 	// servers available
-	vector<string> servers;
+	vector<string> serversList;
 	int selectedServerIndex;
 
 	// player colours available
 	vector<string> playerColours;
 	int selectedColourIndex;
+
+	float textTimeout; // seconds
+	string timeoutText;
 };
 
 #endif //_GUI_H

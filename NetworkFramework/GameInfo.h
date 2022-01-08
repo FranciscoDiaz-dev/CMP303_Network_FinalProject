@@ -3,19 +3,26 @@
 #pragma once
 
 #include <vector>
-#include "PlayerInfo.h"
+#include <utility>
+#include "TankInfo.h"
 #include "SockAddr.h"
+
+using PlayerData = std::pair<SockAddr, TankInfo>;
 
 struct GameInfo
 {
 	// constructor
-	GameInfo() : id(-1), numPlayers(0){}
+	GameInfo() : id(-1), hasStarted(false), numPlayers(0){}
 
 	// components
-	int id; // identifier of this game (if it is -1 means not game has beeen assigned to it yet)
+	// 
+	// Identifier of this game (if it is -1 means not game has beeen assigned to it yet)
+	// This id will determ the "map/level/background" for this game
+	// It is initialised by the server when a game is created on it.
+	int id;
 	int numPlayers; // number of players this game currently has
-	std::vector<PlayerInfo> playersInfo; // information of the players of this game
-	std::vector<SockAddr> playersSockAddr; // addresses of each player
+	bool hasStarted;
+	std::vector<PlayerData*> playersData; // data of all the players of this game
 };
 
 #endif // _GAME_INFO_H

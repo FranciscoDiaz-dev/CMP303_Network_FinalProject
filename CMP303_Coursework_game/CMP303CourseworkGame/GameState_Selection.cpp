@@ -7,23 +7,27 @@ GameState_Selection::GameState_Selection(GameStateManager* stateMgr) : GameState
 {
 	// initialise font and text
 	montserratFont.loadFromFile("Assets/Montserrat-Regular.ttf");
+
+	titleText.setFont(montserratFont);
+	titleText.setOutlineColor(sf::Color::Black);
+	titleText.setOutlineThickness(1.f);
+	titleText.setString(" Selection");
+
 	infoText.setFont(montserratFont);
 	infoText.setOutlineColor(sf::Color::Black);
 	infoText.setOutlineThickness(1.f);
-	infoText.setString("Waiting for other players");
-	instructionsText.setFont(montserratFont);
-	instructionsText.setOutlineColor(sf::Color::Black);
-	instructionsText.setOutlineThickness(1.f);
-	instructionsText.setString("Introduce:\n player name, \n select server \n and player colour.");
-	instructionsText.setPosition(window->getView().getCenter()/2.0f);
+	infoText.setCharacterSize(20);
+	infoText.setString(" Select options and find a game.");
+	infoText.setPosition(sf::Vector2f(titleText.getPosition().x + 300.0f, titleText.getPosition().y + 50.0f));
 
 	// get the objects to use on this class from the shared context
-	player = gameStateManager->getSharedContext()->player;
+	player = gameStateMgr->getSharedContext()->player;
+	player->Reset(); // make sure the player does not contain any old information
 
 	// Declare our ImGui
 	gui = new GUI(stateMgr);
 	// save the gui in the shared context
-	gameStateManager->getSharedContext()->gui = gui;
+	gameStateMgr->getSharedContext()->gui = gui;
 }
 
 GameState_Selection::~GameState_Selection()
@@ -34,23 +38,10 @@ GameState_Selection::~GameState_Selection()
 
 void GameState_Selection::handleInput(sf::Time dt)
 {
-	// check if the user want to pause the game
-	if (input->isKeyDown(sf::Keyboard::P))
-	{
-		input->setKeyUp(sf::Keyboard::P);
-
-		printf("\n\n--------PLAY--------\n\n");
-
-		gameStateManager->switchTo(GState::LEVEL);
-	}
 }
 
 void GameState_Selection::update(sf::Time dt)
 {
-	// Update text
-	//infoText.setString("Waiting for other players. Current players: " + );
-	//infoText.setString("Game Time: " + Utils::stringify(netSimulator->Time()));
-
 	// update gui
 	gui->update(dt);
 }
@@ -60,8 +51,11 @@ void GameState_Selection::render()
 	beginDraw();
 
 	// Render the text
+	window->draw(titleText);
 	window->draw(infoText);
-	window->draw(instructionsText);
+
+	// render
+	player->Render(window);
 
 	// Render the Gui
 	gui->render();

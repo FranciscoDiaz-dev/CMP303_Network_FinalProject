@@ -5,7 +5,7 @@
 #include "ImGUI-SFML\imgui-SFML.h"
 #include "ImGUI\misc\cpp\imgui_stdlib.h"
 
-#include "..\..\NetworkFramework\ServersManager.h"
+#include "..\..\NetworkFramework\ServersListManager.h"
 #include "..\..\NetworkFramework\ServerConnection.h"
 
 
@@ -39,19 +39,19 @@ namespace ImGui
 }
 
 
-GUI::GUI(sf::RenderWindow* wnd, ServersManager* serversMgr, ServerConnection* serverConn) :
-	window(wnd),
-	serversManager(serversMgr),
-	serverConnection(serverConn)
+GUI::GUI(SharedContext* sharedCtxt)
+	: selectedServerIndex(0), sharedContext(sharedCtxt)
 {
+
+	window = sharedContext->window;
+	serversListMgr = sharedContext->serversListMgr;
+
+	// get the list of servers available
+	servers = serversListMgr->getServersList();
+
 	// init GUI
 	ImGui::SFML::Init(*window);
 
-	// get the list of servers available
-	servers = serversManager->getServersList();
-
-	// initialise the default/selected data to show
-	selectedServerIndex = 0;
 }
 
 GUI::~GUI()
@@ -76,7 +76,7 @@ void GUI::render()
 
 
 		// Show list for choosing server if it has not already been choosen
-		if (serverConnection == nullptr)
+		if (sharedContext->serverConnection == nullptr)
 		{
 			//Title
 			ImGui::Text("Choose a server:");
@@ -89,32 +89,31 @@ void GUI::render()
 		}
 
 		// Show Selected Server Details
-		ServerInfo selectedServerInfo = serversManager->getServerInfoById(servers.at(selectedServerIndex));
+		ServerInfo selectedServerInfo = serversListMgr->getServerInfoById(servers.at(selectedServerIndex));
 
 		if (selectedServerInfo.name != "")
 		{
 			ImGui::Text("\n");
 			ImGui::Text("*Server Details*");
 			ImGui::Text(string("Name: " + selectedServerInfo.name).c_str());
-			ImGui::Text(string("IP: " + selectedServerInfo.sockAddr.ipAddr.toString()).c_str());
-			ImGui::Text("Port: %d", selectedServerInfo.sockAddr.port);
-			if(serverConnection != nullptr)
+			ImGui::Text(string("IP: " + selectedServerInfo.ipAddr.toString()).c_str());
+			ImGui::Text("UDP Port: %d", selectedServerInfo.udpPort);
+			ImGui::Text("TCP Listener Port: %d", selectedServerInfo.tcpListenerPort);
+			if(sharedContext->serverConnection != nullptr)
 				ImGui::Text("Status: Running");
 			ImGui::Text("\n");
 		}
 
 		// Run the selected server
-		if (serverConnection == nullptr && ImGui::Button("Run"))
+		if (sharedContext->serverConnection == nullptr && ImGui::Button("Run"))
 		{
-			serversManager->selectServer(servers.at(selectedServerIndex));// initialiseServerById(servers.at(selectedServerIndex));
-
-			serverConnection = new ServerConnection(servers.at(selectedServerIndex), selectedServerInfo);
+			sharedContext->serverConnection = new ServerConnection(servers.at(selectedServerIndex), selectedServerInfo);
 		}
 		// Stop the selected server
-		else if (serverConnection != nullptr && ImGui::Button("Stop"))
+		else if (sharedContext->serverConnection != nullptr && ImGui::Button("Stop"))
 		{
-			delete serverConnection;
-			serverConnection = nullptr;
+			delete sharedContext->serverConnection;
+			sharedContext->serverConnection = nullptr;
 		}
 
 	ImGui::End(); // end window

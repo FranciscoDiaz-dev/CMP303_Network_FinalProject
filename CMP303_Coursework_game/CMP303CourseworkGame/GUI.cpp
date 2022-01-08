@@ -6,7 +6,7 @@
 #include "ImGUI\misc\cpp\imgui_stdlib.h"
 
 #include "SharedContext.h"
-#include "..\..\NetworkFramework\ServersManager.h"
+#include "..\..\NetworkFramework\ServersListManager.h"
 #include "..\..\NetworkFramework\ClientConnection.h"
 #include "Tank.h"
 #include "GameStateManager.h"
@@ -42,21 +42,29 @@ namespace ImGui
 }
 
 
-GUI::GUI(GameStateManager* gameStateManager) :
+GUI::GUI(GameStateManager* gameStateMgr) :
 	selectedServerIndex(0),
 	selectedColourIndex(0),
-	gameStateMgr(gameStateManager)
+	textTimeout(0.0f),
+	gameStateMgr(gameStateMgr)
 {
 	// get the list of servers available
 	window = gameStateMgr->getSharedContext()->window;
-	serversMgr = gameStateMgr->getSharedContext()->serversManager;
+	serversListMgr = gameStateMgr->getSharedContext()->serversListMgr;
 	player = gameStateMgr->getSharedContext()->player;
 	gameId = gameStateMgr->getSharedContext()->gameId;
+	gameState = gameStateMgr->getSharedContext()->gameState;
 	clientConnection = gameStateMgr->getSharedContext()->clientConnection;
 
-	// update server list
-	servers = serversMgr->getServersList();
+	// get servers list
+	serversList = serversListMgr->getServersList();
+
+	// update player colour by default
 	playerColours = {"black", "blue", "green", "red"}; // player colours available
+	player->SetTexture(playerColours.at(selectedColourIndex));
+
+	// Update the player position
+	player->SetPosition(sf::Vector2f(450.0f, 300.0f));
 
 	ImGui::SFML::Init(*window);
 }
@@ -75,6 +83,10 @@ void GUI::processEvent(sf::Event event)
 void GUI::update(sf::Time deltaTime)
 {
 	ImGui::SFML::Update(*window, deltaTime);
+
+	// substract time passed
+	if (textTimeout > 0.0f)
+		textTimeout -= deltaTime.asSeconds();
 }
 
 void GUI::render()
@@ -82,35 +94,40 @@ void GUI::render()
 	ImGui::Begin("Game Settings"); // begin window
 
 		// Choosing Server
-		if (ImGui::Combo("Server", &selectedServerIndex, servers))
+		if (ImGui::Combo("Server", &selectedServerIndex, serversList))
 		{
 		}
 
 		// Choosing Colour of the Tank
 		if (ImGui::Combo("Tank Colour", &selectedColourIndex, playerColours))
 		{
-		}
-
-		if (ImGui::Button("Find a game"))
-		{
-			// Apply colour
+			// Apply colour to the player
 			if (playerColours.at(selectedColourIndex) != player->GetColour())
 			{
-				player->SetColour(playerColours.at(selectedColourIndex));
+				player->SetTexture(playerColours.at(selectedColourIndex));
 			}
-
-			// Apply selected server
-			serversMgr->selectServer(servers.at(selectedServerIndex));
-
-			PlayerMessage playerMsg;
-			playerMsg.gameId = *gameId;
-			playerMsg.playerInfo = player->getPlayerInfo();
-
-			bool joined = clientConnection->joinAGame(&playerMsg, serversMgr->getSelectedServer().sockAddr);
-
-			if (joined)
-				gameStateMgr->switchTo(GState::LEVEL);
 		}
+
+		if (textTimeout <= 0.0f && ImGui::Button("Find a game"))
+		{
+
+			// Get and apply the selected server
+			ServerInfo selectedServerInfo = serversListMgr->getServerInfoById(serversList.at(selectedServerIndex));
+
+			if (clientConnection->joinAGame(selectedServerInfo))
+			{
+				// go to the waiting room
+				gameStateMgr->switchTo(GState::WAITING_ROOM);
+			}
+			else
+			{
+				timeoutText = "\nServer unnavailable, \nplease try later: %ds.";
+				textTimeout = 10.0f; // seconds
+			}
+		}
+
+		if (textTimeout > 0.0f)
+			ImGui::Text(timeoutText.c_str(), int(textTimeout));
 
 	ImGui::End(); // end window
 

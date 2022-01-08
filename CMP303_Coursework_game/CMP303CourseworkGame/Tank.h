@@ -5,75 +5,59 @@
 #include <SFML\Graphics.hpp>
 #include <vector>
 #include <string>
-#include "../../NetworkFramework/PlayerInfo.h"
+#include "../../NetworkFramework/TankInfo.h"
 #include "../../NetworkFramework/ConnectionMessage.h"
-
-enum class RenderMode {
-	REAL_ONLY = 0,
-	PREDICTED_ONLY,
-	REAL_AND_PREDICTED
-};
 
 
 class Tank : public sf::Sprite
 {
 public:
+	// Constructor
 	Tank();
+	// Destructor
 	~Tank();
 
+	// Handle the input of this tanks
+	virtual void HandleInput(float dt);
 	// Sets the player's position to the latest network position
-	void Update(float dt);
+	virtual void Update(float dt);
 	//Draw the player / or the ghost / or both
-	const void Render(sf::RenderWindow* window);
+	virtual void Render(sf::RenderWindow* window);
 
+	// Set the Position of this tank (body and barrel)
+	void SetPosition(sf::Vector2f pos);
 
-	// Add a message to the player's network message queue
-	void AddMessage(const PlayerInfo& msg);
+	// Return the tank info of this tank
+	TankInfo getTankInfo()const { return m_TankInfo; };
+	// Set the Tank info of this tank
+	void setTankInfo(TankInfo newTankInfo);
 
-	// This method calculates and stores the position, but also returns it immediately for use in the main loop
-	// This is my where prediction would be... IF I HAD ANY
-	sf::Vector2f RunPrediction(float gameTime);
+	// Set the texture(and colour) of this tank (barrel and body)
+	virtual void SetTexture(std::string colour);
+	// Get the colour of this player
+	std::string GetColour() { return m_TankInfo.colour; };
 
-	// Use this to set the prediction position
-	void setPosition(float x, float y);
-	void setGhostPosition(sf::Vector2f pos);
+	// Set this tank id
+	void SetId(int id) { m_TankInfo.id = id; };
+	// Return this tank id
+	int GetId() { return m_TankInfo.id; };
 
-	void SetRenderMode(const RenderMode renderMode) { m_RenderMode = renderMode; };
+	// Reset all the tank info
+	virtual void Reset();
 
-	// set the texture/colour of this player
-	void SetColour(std::string colour);
-	std::string GetColour() { return m_PlayerInfo.colour; };
-
-	PlayerInfo getPlayerInfo()const { return m_PlayerInfo; };
-	void setPlayerInfo(PlayerInfo newPlayerInfo) { m_PlayerInfo = newPlayerInfo; };
-
-	void setPlayerId(int id) { m_PlayerInfo.id = id; };
-
-	void Reset();
-
-private:
+protected:
 	// Tank components //
 	// Body
 	sf::Texture	m_BodyTexture;
 	//sf::Sprite is "this" object
-	float		m_BodyRotation;
+	float m_BodyRotation;
 	// Barrel
 	sf::Texture m_BarrelTexture;
-	sf::Sprite	m_BarrelSprite;
-	float		m_BarrelRotation;
+	sf::Sprite m_BarrelSprite;
+	float m_BarrelRotation;
 
-	// Name of this player
-	PlayerInfo m_PlayerInfo;
-
-	// Ghost components (predicted object state)//
-	// it uses the same texture than this object
-	sf::Sprite	m_GhostSprite; // ghost body
-
-	// how this player is rendered
-	RenderMode	m_RenderMode = RenderMode::REAL_ONLY;
-
-	// Component where we will be reading the player stats
-	std::vector<PlayerInfo> m_Messages;
+	// Tank information used for rendering, network, etc
+	TankInfo m_TankInfo;
 };
 
 #endif //_TANK_H

@@ -4,12 +4,12 @@
 // We include the Game State Manager here to avoid the recursive definitions and be available to use the getSharedContext()
 #include "GameStateManager.h"  // this "include" needs to be included in each class that extend from GameStateBase (in the.h)
 
-GameStateBase::GameStateBase(GameStateManager* stateMgr) : gameStateManager(stateMgr)
+GameStateBase::GameStateBase(GameStateManager* stateMgr) : gameStateMgr(stateMgr)
 {
 	// get from game state manager the most used components in every game state to avoid large repetitions of code
-	window = gameStateManager->getSharedContext()->window;
-	input = gameStateManager->getSharedContext()->input;
-	netSimulator = gameStateManager->getSharedContext()->netSimulator;
+	window = gameStateMgr->getSharedContext()->window;
+	input = gameStateMgr->getSharedContext()->input;
+	netSimulator = gameStateMgr->getSharedContext()->netSimulator;
 }
 
 GameStateBase::~GameStateBase()

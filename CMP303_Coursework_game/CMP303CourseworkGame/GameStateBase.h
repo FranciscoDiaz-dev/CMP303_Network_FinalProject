@@ -1,6 +1,6 @@
 // Game State Base
 // All of the game states will extend of Game state Base
-// This class has mainly all the game basic functions (handleInput, update and render), a label, gameStateManager object
+// This class has mainly all the game basic functions (handleInput, update and render), a label, gameStateMgr object
 // also it has a window, audio manager and input component which is obtained from the sharedContext of GameStateManager (just to keep clean and minimize the code) 
 // @author Francisco Diaz (@FMGameDev)
 
@@ -32,7 +32,7 @@ public:
 
 protected:
 	// Pointer to the game state manager
-	GameStateManager* gameStateManager;
+	GameStateManager* gameStateMgr;
 
 	// Window component
 	sf::RenderWindow* window;
