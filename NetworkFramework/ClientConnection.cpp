@@ -15,6 +15,9 @@ ClientConnection::ClientConnection(Tank* tank, int* currentGameId, GameState* cu
 		// ntohs does the opposite of htons.
 		printf("Server socket bound to address %s, port %d\n", sf::IpAddress::getLocalAddress().toString().c_str(), socket.getLocalPort());
 	}*/
+
+	// add the udp and tcp socket to the selector
+	selector.add(udpSocket);
 }
 
 ClientConnection::~ClientConnection()
@@ -25,12 +28,12 @@ ClientConnection::~ClientConnection()
 
 bool ClientConnection::joinAGame(ServerInfo newServerInfo)
 {
-	if (tcpSocket.connect(newServerInfo.ipAddr, newServerInfo.tcpListenerPort) != sf::Socket::Done)
+	// Try to connect to the server
+	if (tcpSocket.connect(newServerInfo.ipAddr, newServerInfo.tcpListenerPort) == sf::Socket::Done)
 	{
-		return false;
-	}
-	else
-	{
+		printf("Connected to server with ip:%s and port:%d.\n", newServerInfo.ipAddr.toString().c_str(), int(newServerInfo.tcpListenerPort));
+
+		// Connection to the server sucessfully
 		PlayerMessage playerMsg;
 		playerMsg.gameId = *gameId;
 		playerMsg.requestType = int(RequestType::JOIN);
@@ -41,7 +44,10 @@ bool ClientConnection::joinAGame(ServerInfo newServerInfo)
 		sf::Packet packetSent, packetReceived;
 		packetSent << playerMsg;
 
-		if (ConnectionBase::tcpSendMessage(packetSent, &tcpSocket) && ConnectionBase::tcpReceiveMessage(&packetReceived, tcpSocket, sf::seconds(1.0f)))
+		// add this server tcp socket to the selector
+		selector.add(tcpSocket);
+
+		if (ConnectionBase::tcpSendMessage(packetSent, tcpSocket) && ConnectionBase::tcpReceiveMessage(&packetReceived, tcpSocket, false, sf::seconds(1.0f)))
 		{
 			// Save the packet received and check if this player
 			// has been assigned a game id
@@ -71,7 +77,14 @@ bool ClientConnection::joinAGame(ServerInfo newServerInfo)
 			}
 		}
 	}
+	else
+	{
 
+		printf("Server with ip:%s and port:%d not reacheable.\n", newServerInfo.ipAddr.toString().c_str(), int(newServerInfo.tcpListenerPort));
+
+		// it has not been possible connect to the server
+		return false;
+	}
 	return false;
 }
 
@@ -126,7 +139,8 @@ bool ClientConnection::joinAGame(Tank* player, int* gameId, GameState* gameState
 
 bool ClientConnection::exitAGame()
 {
-	if (tcpSocket.connect(serverInfo.ipAddr, serverInfo.tcpListenerPort) != sf::Socket::Done)
+	sf::Socket::Status socketStatus = tcpSocket.connect(serverInfo.ipAddr, serverInfo.tcpListenerPort);
+	if (socketStatus != sf::Socket::Done)
 	{
 		return false;
 	}
@@ -142,7 +156,7 @@ bool ClientConnection::exitAGame()
 		sf::Packet packetSent, packetReceived;
 		packetSent << playerMsg;
 
-		if (ConnectionBase::tcpSendMessage(packetSent, &tcpSocket) && ConnectionBase::tcpReceiveMessage(&packetReceived, tcpSocket, sf::seconds(1.0f)))
+		if (ConnectionBase::tcpSendMessage(packetSent, tcpSocket) && ConnectionBase::tcpReceiveMessage(&packetReceived, tcpSocket, false, sf::seconds(1.0f)))
 		{
 			// Save the packet received and check if this player
 			// has been assigned a game id
@@ -152,6 +166,7 @@ bool ClientConnection::exitAGame()
 			if (playerMsg.requestType == int(RequestType::CONFIRMATION)) // this mean it has been assigned a new game
 			{
 				printf("Confirmation of Exit.\n");
+				selector.remove(tcpSocket);
 				return true;
 			}
 			else
@@ -185,7 +200,7 @@ std::vector<TankInfo> ClientConnection::getPlayersInfo(Tank* player, int* gameId
 	SockAddr serverUDPSockAddr(serverInfo.ipAddr, serverInfo.udpPort);
 
 	// if it has been sent and this client has been received a response from the server withit 5 seconds
-	if (ConnectionBase::udpSendMessage(packetSent, serverUDPSockAddr) && ConnectionBase::udpReceiveMessage(&packetReceived, &serverUDPSockAddr, sf::seconds(0.1f)))
+	if (ConnectionBase::udpSendMessage(packetSent, serverUDPSockAddr) && ConnectionBase::udpReceiveMessage(&packetReceived, &serverUDPSockAddr, false, sf::seconds(0.1f)))
 	{
 		while(packetReceived >> playerInfo) // while there is a player to read (save player by player)
 		{

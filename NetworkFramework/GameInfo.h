@@ -13,6 +13,7 @@ struct GameInfo
 {
 	// constructor
 	GameInfo() : id(-1), hasStarted(false), numPlayers(0){}
+	GameInfo(int identifier) : id(identifier), hasStarted(false), numPlayers(0) {}
 
 	// components
 	// 

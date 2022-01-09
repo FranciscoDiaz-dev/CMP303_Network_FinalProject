@@ -16,16 +16,16 @@ public:
 	~ConnectionBase();
 
 	// Send a message to the server (or to anyone, in fact).
-	bool udpSendMessage(sf::Packet packet, SockAddr toSockAddr);
+	bool udpSendMessage(sf::Packet& packet, SockAddr& toSockAddr);
 
 	// Read a response back from the server (or from anyone, in fact).
-	bool udpReceiveMessage(sf::Packet* packet, SockAddr* fromSockAddr, sf::Time timeout = sf::microseconds(1.0f));
+	bool udpReceiveMessage(sf::Packet* packet, SockAddr* fromSockAddr, bool alreadyWaited = false, sf::Time timeout = sf::microseconds(1.0f));
 
 	// Send a message to the server (or to anyone, in fact).
-	bool tcpSendMessage(sf::Packet packet, sf::TcpSocket* tcpSocket);
+	bool tcpSendMessage(sf::Packet& packet, sf::TcpSocket& tcpSocket);
 
 	// Read a response back from the server (or from anyone, in fact).
-	bool tcpReceiveMessage(sf::Packet* packet, sf::TcpSocket& tcpSocket, sf::Time timeout = sf::microseconds(1.0f));
+	bool tcpReceiveMessage(sf::Packet* packet, sf::TcpSocket& tcpSocket, bool alreadyWaited = false, sf::Time timeout = sf::microseconds(1.0f));
 
 protected:
 	sf::UdpSocket udpSocket;

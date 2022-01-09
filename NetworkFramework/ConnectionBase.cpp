@@ -10,7 +10,7 @@ ConnectionBase::~ConnectionBase()
 	printf("Quitting\n");
 }
 
-bool ConnectionBase::udpSendMessage(sf::Packet packet, SockAddr toSockAddr)
+bool ConnectionBase::udpSendMessage(sf::Packet& packet, SockAddr& toSockAddr)
 {
 	printf("UDP Sending Message: ");
 
@@ -43,12 +43,9 @@ bool ConnectionBase::udpSendMessage(sf::Packet packet, SockAddr toSockAddr)
 	}
 }
 
-bool ConnectionBase::udpReceiveMessage(sf::Packet* packet, SockAddr* fromSockAddr, sf::Time timeout)
+bool ConnectionBase::udpReceiveMessage(sf::Packet* packet, SockAddr* fromSockAddr, bool alreadyWaited, sf::Time timeout)
 {
-	// add the socket to the selector
-	selector.add(udpSocket);
-
-	if (selector.wait(timeout))
+	if (alreadyWaited || selector.wait(timeout))
 	{
 		// Test if we have to read 
 		if (selector.isReady(udpSocket))
@@ -90,22 +87,23 @@ bool ConnectionBase::udpReceiveMessage(sf::Packet* packet, SockAddr* fromSockAdd
 }
 
 
-bool ConnectionBase::tcpSendMessage(sf::Packet packet, sf::TcpSocket* tcpSocket)
+bool ConnectionBase::tcpSendMessage(sf::Packet& packet, sf::TcpSocket& tcpSocket)
 {
 	printf("TCP Sending Message: ");
 
-	sf::Socket::Status socketStatus = tcpSocket->send(packet);
+	sf::Socket::Status socketStatus = tcpSocket.send(packet);
 
+	// make sure that all the data is sent
 	while (socketStatus == sf::Socket::Status::Partial)
 	{
-		socketStatus = tcpSocket->send(packet);
+		socketStatus = tcpSocket.send(packet);
 		printf("Partial message sent.\n");
 	}
 
 	switch (socketStatus)
 	{
 	case sf::Socket::Status::Done:
-		printf("Message sent to address:%s and port:%d.\n", tcpSocket->getRemoteAddress().toString(), int(tcpSocket->getLocalPort()));
+		printf("Message sent to address:%s and port:%d.\n", tcpSocket.getRemoteAddress().toString().c_str(), int(tcpSocket.getRemotePort()));
 		return true;
 		break;
 	case sf::Socket::Status::Error:
@@ -123,12 +121,9 @@ bool ConnectionBase::tcpSendMessage(sf::Packet packet, sf::TcpSocket* tcpSocket)
 	}
 }
 
-bool ConnectionBase::tcpReceiveMessage(sf::Packet* packet, sf::TcpSocket& tcpSocket, sf::Time timeout)
+bool ConnectionBase::tcpReceiveMessage(sf::Packet* packet, sf::TcpSocket& tcpSocket, bool alreadyWaited, sf::Time timeout)
 {
-	// add the socket to the selector
-	selector.add(tcpSocket);
-
-	if (selector.wait(timeout))
+	if (alreadyWaited || selector.wait(timeout))
 	{
 		// Test if we have to read 
 		if (selector.isReady(tcpSocket))
@@ -146,7 +141,7 @@ bool ConnectionBase::tcpReceiveMessage(sf::Packet* packet, sf::TcpSocket& tcpSoc
 			switch (socketStatus)
 			{
 			case sf::Socket::Status::Done:
-				printf("Message received from address:%s and port:%d.\n", tcpSocket.getRemoteAddress().toString(), tcpSocket.getLocalPort());
+				printf("Message received from address:%s and port:%d.\n", tcpSocket.getRemoteAddress().toString().c_str(), int(tcpSocket.getRemotePort()));
 				return true;
 				break;
 			case sf::Socket::Status::Error:
@@ -164,7 +159,6 @@ bool ConnectionBase::tcpReceiveMessage(sf::Packet* packet, sf::TcpSocket& tcpSoc
 			}
 		}
 	}
-
 	// timeout finished and none message was received
 	return false;
 }
