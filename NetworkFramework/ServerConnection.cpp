@@ -3,7 +3,7 @@
 
 
 ServerConnection::ServerConnection(string serverIdentifier, ServerInfo& serverInfo)
-	: serverId(serverIdentifier), maxNumPlayersPerGame(4), maxNumGames(2), ConnectionBase()
+	: serverId(serverIdentifier), sendUpdateRate(100), timeSinceLastUpdateSent(100), maxNumPlayersPerGame(4), maxNumGames(2), ConnectionBase()
 {
 	// Bind the UDP socket to the ip iddress and the udp port
 	if (udpSocket.bind(serverInfo.udpPort, serverInfo.ipAddr) != sf::Socket::Done)
@@ -26,10 +26,6 @@ ServerConnection::ServerConnection(string serverIdentifier, ServerInfo& serverIn
 		// Add the listener to the selector
 		selector.add(tcpListener);
 	}
-
-	// add the tcp listenrr and udp sockets to the selector
-	selector.add(tcpListener);
-	selector.add(udpSocket);
 }
 
 ServerConnection::~ServerConnection()
@@ -49,20 +45,51 @@ ServerConnection::~ServerConnection()
 }
 
 
-void ServerConnection::run(sf::Time timeout)
+void ServerConnection::run(sf::Time dt, sf::Time timeout)
 {
 	// Make the selector wait for data on any socket
 	if (selector.wait(timeout))
 	{
 		// Check if there are any important request from the player such as joining a game, leaving a game or wining
-		if(!checkTcpNewConnection())
-			// Process TCP request if they are available
-			processTcpRequests();
+		checkTcpNewConnection();
 
+		// Process TCP requests if they are available
+		processTcpRequests();
 
+		// Process UPD requests (Receiving updates)
+		processUdpRequests();	
+	}
 
-		processUdpRequests();
-		
+	// UDP - SEND UPDATES TO ALL THE PLAYERS
+	// count the time since last send message update
+	timeSinceLastUpdateSent += dt.asMilliseconds();
+
+	// if it is time to send the info
+	if (sendUpdateRate <= timeSinceLastUpdateSent)
+	{
+		printf("Sending the most updated tanks infos (received by the server) to players.\n");
+
+		for (GameInfo* gameInfo : activeGames)
+		{
+			// packet to send
+			sf::Packet packetToPlayer;
+
+			// Get all the tanks info and save them on sf::Packet
+			// this is the paket to be sent to all the players
+			for (PlayerData* playerData : gameInfo->playersData)
+			{
+				packetToPlayer << playerData->second;
+			}
+
+			// Send the most updated version of all the players to every player 
+			for (PlayerData* toPlayerData : gameInfo->playersData)
+			{
+				udpSendMessage(packetToPlayer, toPlayerData->first);
+			}
+		}
+
+		// reset the timer
+		timeSinceLastUpdateSent = 0.0f;
 	}
 }
 
@@ -97,7 +124,7 @@ PlayerData* ServerConnection::createPlayerData(GameInfo* hostGame, TankInfo& new
 	// The current number of players will be the player id
 	// for example: if there are not player (numPlayers == 0)
 	// then the first player id of this game will be 0
-	newTankInfo.id = int(hostGame->playersData.size());
+	newTankInfo.id = hostGame->numPlayers;
 
 	// Step 2:
 	// Set initial player posity by its id
@@ -105,28 +132,24 @@ PlayerData* ServerConnection::createPlayerData(GameInfo* hostGame, TankInfo& new
 	{
 	case 0:
 		newTankInfo.x = 40.0f;
-		newTankInfo.y = 40.0f;
+		newTankInfo.y = 100.0f;
 		break;
 	case 1:
 		newTankInfo.x = 40.0f;
-		newTankInfo.y = 70.0f;
+		newTankInfo.y = 160.0f;
+		break;
+	case 2:
+		newTankInfo.x = 40.0f;
+		newTankInfo.y = 320.0f;
 		break;
 	case 3:
 		newTankInfo.x = 40.0f;
-		newTankInfo.y = 100.0f;
-		break;
-	case 4:
-		newTankInfo.x = 40.0f;
-		newTankInfo.y = 140.0f;
+		newTankInfo.y = 380.0f;
 		break;
 	}
-	// Step 2:
-	// Add player info to the collection of that game and their socket address
-	//hostGame->playersData.push_back();
-
-	// Step 4:
-	// Add the player to the game counter
-	//hostGame->numPlayers++;
+	// Step 3:
+	// Set player timer to 0
+	newTankInfo.time = 0.0f;
 
 	// return the last player added
 	return new PlayerData(SockAddr(), newTankInfo);
@@ -190,45 +213,27 @@ void ServerConnection::processUdpRequests()
 	// create a socket address where we will save the data of the socket we receive the message
 	// as we want to send a message back to them
 	SockAddr fromSockAddr;
+
+	// Receiving the player Message
 	PlayerMessage receivedPlayerMsg;
-
-	// Listening the player Message
 	sf::Packet packetReceived;
-	bool msgReceived = udpReceiveMessage(&packetReceived, &fromSockAddr, true); // don't wait again, just check if this socket is ready
-	packetReceived >> receivedPlayerMsg;
-
-	// UPDATE Request //
-	if (msgReceived && receivedPlayerMsg.requestType == int(RequestType::UPDATE))
+	if (udpReceiveMessage(&packetReceived, &fromSockAddr, true)) // don't wait again, just check if this socket is ready
 	{
-		// Get the game info where the player is
+		// save the message received to player message structure
+		packetReceived >> receivedPlayerMsg;
+
+		// Get the game info where the player is and the player data
 		GameInfo* gameInfo = findGameInfoById(receivedPlayerMsg.gameId);
-		PlayerData* playerData = findPlayerDataById(gameInfo, receivedPlayerMsg.gameId);
+		PlayerData* playerData = findPlayerDataById(gameInfo, receivedPlayerMsg.tankInfo.id);
 
-		// If the player and game have been found:
-		if (gameInfo != nullptr && playerData != nullptr)
+		// If the player and game have been found and
+		// the message received is the most updated received
+		if (gameInfo != nullptr && playerData != nullptr &&
+			playerData->second.time < receivedPlayerMsg.tankInfo.time)
 		{
-			// update the player info in the servers if the time in which this information
-			// was sent is later than the one we currently have
-			//if (gameInfo->playersInfo.at(receivedPlayerMsg.tankInfo.id).time < receivedPlayerMsg.tankInfo.time)
-			//{
-				// update player information on the server
-			playerData->second = receivedPlayerMsg.tankInfo;
-			playerData->first = fromSockAddr;
-
-			// Send the most updated version of all the players to every player 
-			for (PlayerData* toPlayerData : gameInfo->playersData)
-			{
-				sf::Packet packetToPlayer;
-
-				// Convert all the data to sf::Packet
-				for (PlayerData* playerData : gameInfo->playersData)
-				{
-					packetToPlayer << playerData->second;
-				}
-
-				// send message
-				udpSendMessage(packetToPlayer, toPlayerData->first);
-			}
+			// update player information on the server
+			playerData->first = fromSockAddr; // save the latest player sock address (it is useful in case the player address changes)
+			playerData->second = receivedPlayerMsg.tankInfo; // save the latest tank info			
 		}
 	}
 }
@@ -277,13 +282,15 @@ void ServerConnection::processTcpRequests()
 			receivedPacket >> receivedPlayerMessage;
 
 			/* Detect what the player wants */
+			// Join a game
 			if (receivedPlayerMessage.requestType == int(RequestType::JOIN))
 			{
 				processTcpJoinAGameRequest(receivedPlayerMessage, client);
 			}
-			else if (receivedPlayerMessage.requestType == int(RequestType::EXIST))
+			// exit the game
+			else if (receivedPlayerMessage.requestType == int(RequestType::EXIT))
 			{
-				processTcpExitAGameRequest(receivedPlayerMessage, client);
+				processTcpExitTheGameRequest(receivedPlayerMessage, client);
 			}
 		}		
 	}
@@ -335,7 +342,8 @@ void ServerConnection::processTcpJoinAGameRequest(PlayerMessage& receivedPlayerM
 		// update the received message player with the game id assigned and their player id
 		PlayerMessage toPlayerMessage;
 		toPlayerMessage.gameId = hostGame->id;
-		toPlayerMessage.gState = int(GState::WAITING_ROOM);
+		toPlayerMessage.gState = int(GState::LEVEL);
+		toPlayerMessage.requestType = int(RequestType::CONFIRMATION);
 		toPlayerMessage.tankInfo = newPlayerData->second;
 
 		sf::Packet sentPacket;
@@ -343,8 +351,6 @@ void ServerConnection::processTcpJoinAGameRequest(PlayerMessage& receivedPlayerM
 
 		if (tcpSendMessage(sentPacket, client))
 		{
-			// save the player data
-			printf("The player did receive the message.\n");
 			hostGame->playersData.push_back(newPlayerData);
 			hostGame->numPlayers += 1;
 
@@ -353,7 +359,6 @@ void ServerConnection::processTcpJoinAGameRequest(PlayerMessage& receivedPlayerM
 		}
 		else
 		{
-			printf("The player did not receive the message aparently, so delet it.\n");
 			delete newPlayerData;
 			newPlayerData = nullptr;
 		}
@@ -363,10 +368,18 @@ void ServerConnection::processTcpJoinAGameRequest(PlayerMessage& receivedPlayerM
 	else
 	{
 		printf("This server cannot host any new players.");
+
+		// Send to the player a negative answer
+		receivedPlayerMessage.requestType = int(RequestType::REJECTION);
+
+		sf::Packet sentPacket;
+		sentPacket << receivedPlayerMessage;
+
+		tcpSendMessage(sentPacket, client);
 	}
 }
 
-void ServerConnection::processTcpExitAGameRequest(PlayerMessage& receivedPlayerMessage, sf::TcpSocket& client)
+void ServerConnection::processTcpExitTheGameRequest(PlayerMessage& receivedPlayerMessage, sf::TcpSocket& client)
 {
 	printf("Processing request: Exist the game.\n");
 
@@ -374,15 +387,50 @@ void ServerConnection::processTcpExitAGameRequest(PlayerMessage& receivedPlayerM
 	GameInfo* gameInfo = findGameInfoById(receivedPlayerMessage.gameId);
 	PlayerData* playerData = findPlayerDataById(gameInfo, receivedPlayerMessage.tankInfo.id);
 
-	auto removeIt = std::find(gameInfo->playersData.begin(), gameInfo->playersData.end(), playerData);
-	if (removeIt != gameInfo->playersData.end())
-	{
-		gameInfo->playersData.erase(removeIt);
-		gameInfo->numPlayers--;
 
-		// set this client request as done (ready to be removed)
+	// if the game or player was not found then
+	// set this request as done and exit this function
+	if (gameInfo == nullptr || playerData == nullptr) 
+	{
 		tcpRequestsToRemove.push_back(&client);
 	}
+	else
+	{
+		// if the player and game exit then delete it
+		auto removePlayerIt = std::find(gameInfo->playersData.begin(), gameInfo->playersData.end(), playerData);
+		if (removePlayerIt != gameInfo->playersData.end())
+		{
+			// delete player
+			gameInfo->playersData.erase(removePlayerIt);
+			gameInfo->numPlayers--;
+
+			// Check if there are any more players on that game,
+			// if there aren't then remove the game
+			if (gameInfo->numPlayers == 0)
+			{
+				auto removeGameIt = std::find(activeGames.begin(), activeGames.end(), gameInfo);
+				if (removeGameIt != activeGames.end())
+				{
+					activeGames.erase(removeGameIt);
+				}
+			}
+
+			// set this client request as done (ready to be removed)
+			tcpRequestsToRemove.push_back(&client);
+		}
+	}
+
+
+	// Send the player a message confirming the player is not anymore on this server database (or the game) 
+	PlayerMessage toPlayerMessage;
+	// Set new data for the player message
+	//toPlayerMessage.gameId = -1;
+	//toPlayerMessage.gState = int(GState::SELECTION);
+	toPlayerMessage.requestType = int(RequestType::CONFIRMATION);
+
+	sf::Packet sentPacket;
+	sentPacket << toPlayerMessage;
+	tcpSendMessage(sentPacket, client);
 }
 
 

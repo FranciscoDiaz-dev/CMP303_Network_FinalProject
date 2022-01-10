@@ -117,9 +117,6 @@
     <ClCompile Include="EnemiesManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GameState_WaitingRoom.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\NetworkFramework\RequestType.cpp">
       <Filter>NetworkFramework</Filter>
     </ClCompile>
@@ -195,9 +192,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EnemiesManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GameState_WaitingRoom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\NetworkFramework\RequestType.h">

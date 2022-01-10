@@ -16,6 +16,9 @@ bool ConnectionBase::udpSendMessage(sf::Packet& packet, SockAddr& toSockAddr)
 
 	sf::Socket::Status socketStatus = udpSocket.send(packet, toSockAddr.ipAddr, toSockAddr.port);
 
+	// With UDP one dagram sent => one datagram received
+	// so this while would not be used (only usseful for TCP)
+	// however I have decided to use it just in case
 	while (socketStatus == sf::Socket::Status::Partial)
 	{
 		socketStatus = udpSocket.send(packet, toSockAddr.ipAddr, toSockAddr.port);
@@ -45,15 +48,20 @@ bool ConnectionBase::udpSendMessage(sf::Packet& packet, SockAddr& toSockAddr)
 
 bool ConnectionBase::udpReceiveMessage(sf::Packet* packet, SockAddr* fromSockAddr, bool alreadyWaited, sf::Time timeout)
 {
+	selector.add(udpSocket);
+
 	if (alreadyWaited || selector.wait(timeout))
 	{
 		// Test if we have to read 
-		if (selector.isReady(udpSocket))
+		if ( selector.isReady(udpSocket) || !udpSocket.isBlocking())
 		{
 			printf("UDP Reading Message: ");
 
 			sf::Socket::Status socketStatus = udpSocket.receive(*packet, fromSockAddr->ipAddr, fromSockAddr->port);
 
+			// With UDP one dagram sent => one datagram received
+			// so this while would not be used (only usseful for TCP)
+			// however I have decided to use it just in case
 			while (socketStatus == sf::Socket::Status::Partial)
 			{
 				socketStatus = udpSocket.receive(*packet, fromSockAddr->ipAddr, fromSockAddr->port);
@@ -93,7 +101,7 @@ bool ConnectionBase::tcpSendMessage(sf::Packet& packet, sf::TcpSocket& tcpSocket
 
 	sf::Socket::Status socketStatus = tcpSocket.send(packet);
 
-	// make sure that all the data is sent
+	// make sure that all the data is sent (this is TCP)
 	while (socketStatus == sf::Socket::Status::Partial)
 	{
 		socketStatus = tcpSocket.send(packet);
@@ -132,6 +140,7 @@ bool ConnectionBase::tcpReceiveMessage(sf::Packet* packet, sf::TcpSocket& tcpSoc
 
 			sf::Socket::Status socketStatus = tcpSocket.receive(*packet);
 
+			// make sure all the data is received (this is TCP)
 			while (socketStatus == sf::Socket::Status::Partial)
 			{
 				socketStatus = tcpSocket.receive(*packet);

@@ -5,31 +5,38 @@
 #include <vector>
 #include "ConnectionBase.h"
 #include "ServerInfo.h"
-#include "../CMP303_Coursework_game/CMP303CourseworkGame/Tank.h"
+#include "TankInfo.h"
+#include "RequestType.h"
 
-
+class Tank;
+class EnemiesManager;
+class GameState;
 
 class ClientConnection : public ConnectionBase
 {
 public:
 	// constructor
-	ClientConnection(Tank* player, int* gameId, GameState* gameState);
+	ClientConnection(Tank* tank, EnemiesManager* enemiesManager, int* currentGameId, GameState* currentGameState);
 	// destructor
 	~ClientConnection();
 
-	// run the conexion to a server
+	// ask the server to join a game, return true if it has joined
 	bool joinAGame(ServerInfo newServerInfo);
 
-	bool exitAGame();
+	// inform the server this player wants to exit the game
+	bool exitTheGame();
 
 	// return the lastest players information saved/received on the server
-	std::vector<TankInfo> getPlayersInfo(Tank* player, int* gameId, GameState* gameState);
+	bool sendThisPlayerInfoToServer();
+
+	std::vector<TankInfo> getEnemiesInfos();
 
 private:
 	ServerInfo serverInfo; // server information
 	sf::TcpSocket tcpSocket; // client socket
 
 	Tank* player;
+	EnemiesManager* enemiesMgr;
 	int* gameId;
 	GameState* gameState;
 };

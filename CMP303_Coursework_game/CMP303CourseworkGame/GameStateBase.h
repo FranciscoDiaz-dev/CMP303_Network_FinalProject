@@ -38,7 +38,14 @@ protected:
 	sf::RenderWindow* window;
 	// Imput component
 	Input* input;
-	NetworkSimulator* netSimulator;
+
+	// object to connect to server
+	ClientConnection* clientConnection;
+
+	// Text
+	sf::Font montserratFont;
+	sf::Text titleText; // text of the window/game state
+	sf::Text infoText; // text to print any info to the right
 
 	// Default functions for rendering to the screen.
 	void beginDraw();

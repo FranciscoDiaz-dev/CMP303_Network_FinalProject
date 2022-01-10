@@ -108,6 +108,16 @@ void GUI::render()
 			}
 		}
 
+		bool isBot = player->GetIsBot();
+		if (ImGui::Checkbox("Is a bot", &isBot))
+		{
+			// if the new value is different from the one it currently has then change it
+			if (isBot != player->GetIsBot())
+			{
+				player->SetIsBot(isBot);
+			}
+		}
+
 		if (textTimeout <= 0.0f && ImGui::Button("Find a game"))
 		{
 
@@ -116,8 +126,9 @@ void GUI::render()
 
 			if (clientConnection->joinAGame(selectedServerInfo))
 			{
-				// go to the waiting room
-				gameStateMgr->switchTo(GState::WAITING_ROOM);
+				// go to the game
+				gameStateMgr->switchTo(GState::LEVEL);
+				gameStateMgr->addToRemoveContainer(GState::SELECTION);
 			}
 			else
 			{

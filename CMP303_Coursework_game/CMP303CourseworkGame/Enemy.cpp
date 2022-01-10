@@ -34,8 +34,7 @@ void Enemy::Render(sf::RenderWindow* window)
 	// Render real tank
 	if ((int)m_RenderMode != 1)
 	{
-		window->draw(*this);
-		window->draw(m_BarrelSprite);
+		Tank::Render(window);
 	}
 }
 
@@ -57,9 +56,19 @@ void Enemy::SetTexture(std::string colour)
 	setGhostPosition(getPosition());
 }
 
-void Enemy::AddTankInfo(const TankInfo& latestTanksInfo)
+void Enemy::AddLatestTankInfo(const TankInfo& latestTanksInfo)
 {
+	// update the tank info
+	setTankInfo(latestTanksInfo);
+	// add it to the collection
     m_Messages.push_back(latestTanksInfo);
+
+	// remove the oldest message if the amount of message in the collection
+	// is bigger than needed to calculate predictions
+	if (int(m_Messages.size()) > 4)
+	{
+		m_Messages.erase(m_Messages.begin());
+	}
 }
 
 sf::Vector2f Enemy::RunPrediction(float gameTime)

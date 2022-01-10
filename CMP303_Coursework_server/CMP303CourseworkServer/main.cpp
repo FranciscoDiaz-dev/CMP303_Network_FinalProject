@@ -147,7 +147,7 @@ int main()
 		if (sharedContext.serverConnection != nullptr)
 		{
 			// update server data
-			sharedContext.serverConnection->run();
+			sharedContext.serverConnection->run(deltaTime);
 			sharedContext.debugText->setString(sharedContext.serverConnection->getActiveGamesInfo());
 		}
 

@@ -8,12 +8,12 @@
 #define _GAMESTATE_SELECTION_H
 #pragma once
 
+#include <vector>
 #include "GameStateBase.h"
 #include "GameStateManager.h"
-#include "Tank.h"
-#include "GUI.h"
 
-#include <vector>
+class Tank;
+class GUI;
 
 class GameState_Selection : public GameStateBase
 {
@@ -36,13 +36,11 @@ public:
 private:
 	// This player object
 	Tank* player;
-	EnemiesManager* enemiesMgr;
 
 	// Text
-	sf::Font montserratFont;
-	sf::Text titleText;
 	sf::Text infoText;
 
+	// Gui which is used as the menu for this network game
 	GUI* gui;
 };
 

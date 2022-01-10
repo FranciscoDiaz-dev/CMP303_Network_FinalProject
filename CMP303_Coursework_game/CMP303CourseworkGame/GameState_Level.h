@@ -10,11 +10,9 @@
 
 #include "GameStateBase.h"
 #include "GameStateManager.h"
-#include "Tank.h"
-#include "EnemiesManager.h"
-#include "..\..\NetworkFramework\ClientConnection.h"
 
-#include <vector>
+class Tank;
+class EnemiesManager;
 
 class GameState_Level: public GameStateBase
 {
@@ -48,12 +46,8 @@ private:
 	sf::Texture floorTexture;
 	sf::Sprite floor;
 
-	// Text
-	sf::Font montserratFont;
-	sf::Text debugText;
-
-	ClientConnection* clientConnection;
-	int* gameId;
+	float sendUpdateRequestRate;
+	float timeSinceLastUpdateRequest;
 };
 
 #endif _GAMESTATE_LEVEL_H

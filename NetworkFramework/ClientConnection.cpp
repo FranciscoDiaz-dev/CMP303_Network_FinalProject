@@ -2,210 +2,186 @@
 #include "ConnectionMessage.h"
 #include "RequestType.h"
 
-ClientConnection::ClientConnection(Tank* tank, int* currentGameId, GameState* currentGameState)
-	: player(tank), gameId(currentGameId), gameState(currentGameState), ConnectionBase()
-{
-	/*// bind the socket to the ip iddress and the port
-	if (socket.bind(sf::Socket::AnyPort, static_cast<sf::IpAddress>("0.0.0.0")) != sf::Socket::Done) // "0.0.0.0" means any ip available
-	{
-		printf("Server socket bound failed to address %s, port %d\n", sf::IpAddress::getLocalAddress().toString().c_str(), socket.getLocalPort());
-	}
-	else
-	{
-		// ntohs does the opposite of htons.
-		printf("Server socket bound to address %s, port %d\n", sf::IpAddress::getLocalAddress().toString().c_str(), socket.getLocalPort());
-	}*/
+#include "../CMP303_Coursework_game/CMP303CourseworkGame/EnemiesManager.h"
+#include "../CMP303_Coursework_game/CMP303CourseworkGame/Tank.h"
+#include "../CMP303_Coursework_game/CMP303CourseworkGame/Framework/Vector.h"
 
-	// add the udp and tcp socket to the selector
-	selector.add(udpSocket);
+ClientConnection::ClientConnection(Tank* tank, EnemiesManager* enemiesManager, int* currentGameId, GameState* currentGameState)
+	: player(tank), enemiesMgr(enemiesManager), gameId(currentGameId), gameState(currentGameState), ConnectionBase()
+{
+	udpSocket.setBlocking(false);
 }
 
 ClientConnection::~ClientConnection()
 {
-	exitAGame();
+	// if the player is in a game then exist
+	// in case the player close the windowsetc
+	if (*gameId != -1)
+		exitTheGame();
 }
 
 
 bool ClientConnection::joinAGame(ServerInfo newServerInfo)
 {
 	// Try to connect to the server
-	if (tcpSocket.connect(newServerInfo.ipAddr, newServerInfo.tcpListenerPort) == sf::Socket::Done)
+	sf::Socket::Status socketStatus = tcpSocket.connect(newServerInfo.ipAddr, newServerInfo.tcpListenerPort);
+
+	if (socketStatus == sf::Socket::Done)
 	{
-		printf("Connected to server with ip:%s and port:%d.\n", newServerInfo.ipAddr.toString().c_str(), int(newServerInfo.tcpListenerPort));
+		printf("TCP Connected to server with ip:%s and port:%d.\n", newServerInfo.ipAddr.toString().c_str(), int(newServerInfo.tcpListenerPort));
 
 		// Connection to the server sucessfully
-		PlayerMessage playerMsg;
-		playerMsg.gameId = *gameId;
-		playerMsg.requestType = int(RequestType::JOIN);
-		playerMsg.gState = int(gameState->getCurrentState());
-		playerMsg.tankInfo = player->getTankInfo();
+		PlayerMessage playerMsgSent;
+		playerMsgSent.gameId = *gameId;
+		playerMsgSent.requestType = int(RequestType::JOIN);
+		playerMsgSent.gState = int(gameState->getCurrentState());
+		playerMsgSent.tankInfo = player->getTankInfo();
 
 		// Convert this message to sf::packet format and send it
 		sf::Packet packetSent, packetReceived;
-		packetSent << playerMsg;
+		packetSent << playerMsgSent;
 
 		// add this server tcp socket to the selector
 		selector.add(tcpSocket);
 
-		if (ConnectionBase::tcpSendMessage(packetSent, tcpSocket) && ConnectionBase::tcpReceiveMessage(&packetReceived, tcpSocket, false, sf::seconds(1.0f)))
+		if (ConnectionBase::tcpSendMessage(packetSent, tcpSocket) && ConnectionBase::tcpReceiveMessage(&packetReceived, tcpSocket, false, sf::Time::Zero))
 		{
-			// Save the packet received and check if this player
-			// has been assigned a game id
-			packetReceived >> playerMsg;
+			// Save the packet received into a player message structure
+			PlayerMessage playerMsgReceived;
+			packetReceived >> playerMsgReceived;
+
 			// If a game has been assigned to the player then update the all player information, game id assigned and server address
-			if (playerMsg.gameId != -1) // this mean it has been assigned a new game
+			if (playerMsgReceived.requestType == int(RequestType::CONFIRMATION)) // this mean the server has processed the request, thus the player was added to a new game
 			{
 				// Update the game id
-				*gameId = playerMsg.gameId;
+				*gameId = playerMsgReceived.gameId;
 				// Update the player info
 				// which contain the new player id, new position etc (assigned by the server)
-				player->setTankInfo(playerMsg.tankInfo);
+				player->setTankInfo(playerMsgReceived.tankInfo);
 
 				// Save the server address
 				serverInfo = newServerInfo;
 
-				// update the player info;
-				printf("Game assigned: %d, player id assigned: %d.\n", playerMsg.gameId, playerMsg.tankInfo.id);
+				// print info
+				printf("\tGame assigned: %d, player id assigned: %d.\n", playerMsgReceived.gameId, playerMsgReceived.tankInfo.id);
 
 				return true;
 			}
-			else
-			{
-				// if we received the -1 game id means that the server didn't received the message or the server is currently busy
-				printf("No Game was assigned to this player.\n");
-				return false;
-			}
 		}
 	}
 	else
 	{
-
-		printf("Server with ip:%s and port:%d not reacheable.\n", newServerInfo.ipAddr.toString().c_str(), int(newServerInfo.tcpListenerPort));
-
 		// it has not been possible connect to the server
+		printf("TCP Server with ip:%s and port:%d not reacheable.\n", newServerInfo.ipAddr.toString().c_str(), int(newServerInfo.tcpListenerPort));
 		return false;
 	}
+
+	// The server is currently busy or the server cannot host more players/games
+	printf("\tNo Game was assigned to this player.\n");
 	return false;
 }
 
-/*
-bool ClientConnection::joinAGame(Tank* player, int* gameId, GameState* gameState, ServerInfo newServerInfo)
-{
-	// Create message with the player and the rest of information to send
-	PlayerMessage playerMsg;
-	playerMsg.gameId = *gameId;
-	playerMsg.requestType = int(RequestType::JOIN);
-	playerMsg.gState = int(gameState->getCurrentState());
-	playerMsg.tankInfo = player->getTankInfo();
-
-	// Convert this message to sf::packet format and send it
-	sf::Packet packetSent, packetReceived;
-	packetSent << playerMsg;
-
-	// if it has been sent and this client has been received a response from the server withit 5 seconds
-	if(ConnectionBase::udpSendMessage(packetSent, SockAddr(serverInfo.ipAddr, serverInfo.udpPort)) && ConnectionBase::udpReceiveMessage(&packetReceived, &serverSockAddr, sf::seconds(0.1f)))
-	{
-		// Save the packet received and check if this player
-		// has been assigned a game id
-		packetReceived >> playerMsg;
-		// If a game has been assigned to the player then update the all player information, game id assigned and server address
-		if (playerMsg.gameId != -1) // this mean it has been assigned a new game
-		{
-			// Update the game id
-			*gameId = playerMsg.gameId;
-			// Update the player info
-			// which contain the new player id, new position etc (assigned by the server)
-			player->setTankInfo(playerMsg.tankInfo);
-
-			// Save the server address
-			serverSocketAddr = serverSockAddr;
-
-			// update the player info;
-			printf("Game assigned: %d, player id assigned: %d.\n", playerMsg.gameId, playerMsg.tankInfo.id);
-
-			return true;
-		}
-		else
-		{
-			// if we received the -1 game id means that the server didn't received the message or the server is currently busy
-			printf("No Game was assigned to this player.\n");
-			return false;
-		}
-		
-	}
-	return false;
-}
-*/
-
-bool ClientConnection::exitAGame()
+bool ClientConnection::exitTheGame()
 {
 	sf::Socket::Status socketStatus = tcpSocket.connect(serverInfo.ipAddr, serverInfo.tcpListenerPort);
-	if (socketStatus != sf::Socket::Done)
+
+	// if the connection was successfull
+	if(socketStatus == sf::Socket::Done)
 	{
-		return false;
-	}
-	else
-	{
-		PlayerMessage playerMsg;
-		playerMsg.gameId = *gameId;
-		playerMsg.requestType = int(RequestType::EXIST);
-		playerMsg.gState = int(gameState->getCurrentState());
-		playerMsg.tankInfo = player->getTankInfo();
+		printf("TCP Connected to server with ip:%s and port:%d.\n", serverInfo.ipAddr.toString().c_str(), int(serverInfo.tcpListenerPort));
+
+		PlayerMessage playerMsgSent;
+		playerMsgSent.gameId = *gameId;
+		playerMsgSent.requestType = int(RequestType::EXIT);
+		playerMsgSent.gState = int(gameState->getCurrentState());
+		playerMsgSent.tankInfo = player->getTankInfo();
 
 		// Convert this message to sf::packet format and send it
 		sf::Packet packetSent, packetReceived;
-		packetSent << playerMsg;
+		packetSent << playerMsgSent;
 
-		if (ConnectionBase::tcpSendMessage(packetSent, tcpSocket) && ConnectionBase::tcpReceiveMessage(&packetReceived, tcpSocket, false, sf::seconds(1.0f)))
+		if (ConnectionBase::tcpSendMessage(packetSent, tcpSocket) && ConnectionBase::tcpReceiveMessage(&packetReceived, tcpSocket, false, sf::Time::Zero))
 		{
-			// Save the packet received and check if this player
-			// has been assigned a game id
-			packetReceived >> playerMsg;
+			// Save the packet received into a player message structure
+			PlayerMessage playerMsgReceived;
+			packetReceived >> playerMsgReceived;
 
-			// If a game has been assigned to the player then update the all player information, game id assigned and server address
-			if (playerMsg.requestType == int(RequestType::CONFIRMATION)) // this mean it has been assigned a new game
+			if (playerMsgReceived.requestType == int(RequestType::CONFIRMATION)) // this mean the server has processed the request, thus the player was deleted form the server
 			{
-				printf("Confirmation of Exit.\n");
+				printf("\tConfirmation of Exit.\n");
+
+				// Reset the game id to the one received by the server
+				*gameId = -1;
+
+				// set this socket is not going to be used at the moment
+				// thus remove it from the selector notifications
 				selector.remove(tcpSocket);
+
 				return true;
-			}
-			else
-			{
-				// if we received the -1 game id means that the server didn't received the message or the server is currently busy
-				printf("No confirmation of Exit.\n");
-				return false;
 			}
 		}
 	}
+	else
+	{
+		// it has not been possible connect to the server
+		printf("TCP Server with ip:%s and port:%d not reacheable.\n", serverInfo.ipAddr.toString().c_str(), int(serverInfo.tcpListenerPort));
+		return false;
+	}
 
+	printf("\tNo confirmation of Exit.\n");
 	return false;
 }
 
-std::vector<TankInfo> ClientConnection::getPlayersInfo(Tank* player, int* gameId, GameState* gameState)
+bool ClientConnection::sendThisPlayerInfoToServer()
 {
 	// Create message with the player and the rest of information to send
-	PlayerMessage playerMsg;
-	playerMsg.gameId = *gameId;
-	playerMsg.requestType = int(RequestType::UPDATE);
-	playerMsg.gState = int(gameState->getCurrentState());
-	playerMsg.tankInfo = player->getTankInfo();
+	PlayerMessage playerMsgSent;
+	playerMsgSent.gameId = *gameId;
+	playerMsgSent.requestType = int(RequestType::UPDATE);
+	playerMsgSent.gState = int(gameState->getCurrentState());
+	playerMsgSent.numActiveEnemies = enemiesMgr->getNumActiveEnemies();
+	playerMsgSent.tankInfo = player->getTankInfo();
 
 	// Convert this message to sf::packet format and send it
-	sf::Packet packetSent, packetReceived;
-	packetSent << playerMsg;
+	sf::Packet packetSent;
+	packetSent << playerMsgSent;
 
-	TankInfo playerInfo;
-	std::vector<TankInfo> playersInfo;
+	// create the objects where the player infos will be saved
+	TankInfo tankInfoReceived;
+	std::vector<TankInfo> tanksInfoReceived;
 
+	// The server socket address, and the object where the server address response will be saved
 	SockAddr serverUDPSockAddr(serverInfo.ipAddr, serverInfo.udpPort);
 
-	// if it has been sent and this client has been received a response from the server withit 5 seconds
-	if (ConnectionBase::udpSendMessage(packetSent, serverUDPSockAddr) && ConnectionBase::udpReceiveMessage(&packetReceived, &serverUDPSockAddr, false, sf::seconds(0.1f)))
+	// if it has been sent and this client has been received a response from the server then update the player info and enemies info
+	if (ConnectionBase::udpSendMessage(packetSent, serverUDPSockAddr))
+		return true;
+	else
+		return false;
+}
+
+std::vector<TankInfo> ClientConnection::getEnemiesInfos()
+{ 
+	// create the objects where the player infos will be saved
+	sf::Packet packetReceived;
+	TankInfo tankInfoReceived;
+	std::vector<TankInfo> tanksInfoReceived;
+
+	// The server socket address, and the object where the server address response will be saved
+	SockAddr fromUDPSockAddr;
+
+	// if it has been sent and this client has been received a response from the server then update the player info and enemies info
+	if (ConnectionBase::udpReceiveMessage(&packetReceived, &fromUDPSockAddr, true))
 	{
-		while(packetReceived >> playerInfo) // while there is a player to read (save player by player)
+		while (packetReceived >> tankInfoReceived) // while there is a player to read (save player info by player info)
 		{
-			playersInfo.push_back(playerInfo);
+			tanksInfoReceived.push_back(tankInfoReceived);
 		}
+
+		// remove this player from the list
+		if(!tanksInfoReceived.empty())
+			tanksInfoReceived.erase(tanksInfoReceived.begin() + player->GetId()); // remove this player from the collection
 	}
-	return playersInfo;
+
+	return tanksInfoReceived;
 }

@@ -1,32 +1,23 @@
 #include "GameState_Selection.h"
 
+#include "..\..\NetworkFramework\ClientConnection.h"
 #include "Framework/Input.h"
-#include "NetworkSimulator.h"
+#include "Tank.h"
+#include "GUI.h"
 
 GameState_Selection::GameState_Selection(GameStateManager* stateMgr) : GameStateBase(stateMgr)
 {
-	// initialise font and text
-	montserratFont.loadFromFile("Assets/Montserrat-Regular.ttf");
-
-	titleText.setFont(montserratFont);
-	titleText.setOutlineColor(sf::Color::Black);
-	titleText.setOutlineThickness(1.f);
+	// initialise text strings
 	titleText.setString(" Selection");
-
-	infoText.setFont(montserratFont);
-	infoText.setOutlineColor(sf::Color::Black);
-	infoText.setOutlineThickness(1.f);
-	infoText.setCharacterSize(20);
 	infoText.setString(" Select options and find a game.");
-	infoText.setPosition(sf::Vector2f(titleText.getPosition().x + 300.0f, titleText.getPosition().y + 50.0f));
 
 	// get the objects to use on this class from the shared context
 	player = gameStateMgr->getSharedContext()->player;
 	player->Reset(); // make sure the player does not contain any old information
 
 	// Declare our ImGui
-	gui = new GUI(stateMgr);
 	// save the gui in the shared context
+	gui = new GUI(stateMgr);
 	gameStateMgr->getSharedContext()->gui = gui;
 }
 

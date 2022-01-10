@@ -1,9 +1,17 @@
 #include "Tank.h"
 
 
-Tank::Tank() : sf::Sprite()
+Tank::Tank(bool isBot)
+	: m_IsBot(isBot), sf::Sprite()
 {
-	//Reset();
+	// Initialise font and text
+	m_MontserratFont.loadFromFile("Assets/Montserrat-Regular.ttf");
+
+	m_TankIdText.setFont(m_MontserratFont);
+	m_TankIdText.setOutlineColor(sf::Color::Black);
+	m_TankIdText.setOutlineThickness(1.f);
+	m_TankIdText.setCharacterSize(10);
+	m_TankIdText.setPosition(sf::Vector2f(250.0f, 20.0f));
 }
 
 
@@ -18,12 +26,21 @@ void Tank::HandleInput(float dt)
 
 void Tank::Update(float dt)
 {
+	// move the tank if it is a bot
+	m_TankInfo.time += dt;
+}
+
+void Tank::UpdateTime(float timeSinceLastUpdateRequest)
+{
+	// move the tank if it is a bot
+	m_TankInfo.time += timeSinceLastUpdateRequest;
 }
 
 void Tank::Render(sf::RenderWindow* window)
 {
 	window->draw(*this);
 	window->draw(m_BarrelSprite);
+	window->draw(m_TankIdText);
 }
 
 
@@ -36,10 +53,22 @@ void Tank::setTankInfo(TankInfo newTankInfo)
 		SetTexture(newTankInfo.colour);
 	}
 
-	// Set Position
+	// Set Position of the tank
 	SetPosition(sf::Vector2f(newTankInfo.x, newTankInfo.y));
 
-	// update the full tank info
+	// Set Text
+	if (m_TankInfo.id != newTankInfo.id)
+	{
+		std::string tankText = "Player: " + std::to_string(newTankInfo.id);
+
+		// add a suffix if it is a bot
+		if (m_IsBot)
+			tankText += " (bot)";
+
+		m_TankIdText.setString(tankText);
+	}
+
+	// update the full tank info variable/container
 	m_TankInfo = newTankInfo;
 }
 
@@ -64,6 +93,8 @@ void Tank::Reset()
 {
 	// Set a new player info
 	setTankInfo(TankInfo());
+
+	m_IsBot = false;
 }
 
 void Tank::SetPosition(sf::Vector2f pos)
@@ -77,5 +108,7 @@ void Tank::SetPosition(sf::Vector2f pos)
 	// save position in the player info struc
 	m_TankInfo.x = pos.x;
 	m_TankInfo.y = pos.y;
-	m_TankInfo.time = 1.0f; // TODO: MOVE TO ANOTHER PLACE
+
+	// Set position of the text
+	m_TankIdText.setPosition(sf::Vector2f(pos.x + 20, pos.y - 30)); // up and right
 }

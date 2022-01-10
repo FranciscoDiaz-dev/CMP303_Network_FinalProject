@@ -13,7 +13,7 @@ class Tank : public sf::Sprite
 {
 public:
 	// Constructor
-	Tank();
+	Tank(bool isBot = false);
 	// Destructor
 	~Tank();
 
@@ -42,8 +42,13 @@ public:
 	// Return this tank id
 	int GetId() { return m_TankInfo.id; };
 
+	void UpdateTime(float timeSinceLastUpdateRequest);
+
 	// Reset all the tank info
 	virtual void Reset();
+
+	bool GetIsBot()const { return m_IsBot; };
+	void SetIsBot(bool isBot) { m_IsBot = isBot; };
 
 protected:
 	// Tank components //
@@ -58,6 +63,13 @@ protected:
 
 	// Tank information used for rendering, network, etc
 	TankInfo m_TankInfo;
+
+	// Text and font to show the identifier of this tank on screen
+	sf::Text m_TankIdText;
+	sf::Font m_MontserratFont;
+
+	// to detect if it is a bot or not
+	bool m_IsBot;
 };
 
 #endif //_TANK_H

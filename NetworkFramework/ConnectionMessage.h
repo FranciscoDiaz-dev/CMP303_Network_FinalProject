@@ -12,7 +12,7 @@
 struct PlayerMessage
 {
 	// constructor
-	PlayerMessage() : gameId(-1), requestType(int(RequestType::NONE)), gState(int(GState::SELECTION)) {}
+	PlayerMessage() : gameId(-1), requestType(int(RequestType::NONE)), gState(int(GState::SELECTION)), numActiveEnemies(0){}
 
 	// components
 	// Identifier of the game this player is from (if it is -1 means not game has beeen assigned to it yet)
@@ -21,7 +21,7 @@ struct PlayerMessage
 	int gameId;
 	int requestType;
 	int gState;
-
+	int numActiveEnemies; // number of enemies which this player/tank has information about
 	TankInfo tankInfo;// information of the player
 };
 

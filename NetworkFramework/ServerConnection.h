@@ -22,7 +22,7 @@ public:
 	~ServerConnection();
 
 	// run the conexion to a client
-	void run(sf::Time timeout = sf::microseconds(1.0f));
+	void run(sf::Time dt, sf::Time timeout = sf::microseconds(1.0f));
 
 	// return the info of the server
 	string getActiveGamesInfo();
@@ -64,6 +64,9 @@ private:
 	// Process Update a Game (UP request)
 	void processUdpRequests();
 
+	float sendUpdateRate = 100.0f; //ms
+	float timeSinceLastUpdateSent = 0.0f; //ms
+
 
 	/* TCP */
 
@@ -80,13 +83,17 @@ private:
 	void processTcpRequests();
 	// Process Join a Game (TCP request)
 	void processTcpJoinAGameRequest(PlayerMessage& receivedPlayerMessage, sf::TcpSocket& client);
-	// Process Leave a Game (TCP request)
-	void processTcpExitAGameRequest(PlayerMessage& receivedPlayerMessage, sf::TcpSocket& client);
+	// Process Update tanks (TCP request)
+	//void processTcpUpdateTanksRequest(PlayerMessage& receivedPlayerMessage, sf::TcpSocket& client);
+	// Process Exit the Game (TCP request)
+	void processTcpExitTheGameRequest(PlayerMessage& receivedPlayerMessage, sf::TcpSocket& client);
 	// Process to remove all the request which has been set to be removed because they have been already processed
 	void removeProcessedTCPRequests();
 	// Remove from the pending tcp requests list, and selector, all TCP client sockets
 	// which they requests have been already solved
 	void removeTCPRequest(sf::TcpSocket* client);
+
+
 };
 
 #endif // _SERVER_CONNECTION_H

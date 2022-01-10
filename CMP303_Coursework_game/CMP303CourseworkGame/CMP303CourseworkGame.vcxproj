@@ -35,7 +35,6 @@
     <ClCompile Include="GameStateManager.cpp" />
     <ClCompile Include="GameState_Level.cpp" />
     <ClCompile Include="GameState_Selection.cpp" />
-    <ClCompile Include="GameState_WaitingRoom.cpp" />
     <ClCompile Include="GUI.cpp" />
     <ClCompile Include="ImGUI-master\ImGUI-SFML\imgui-SFML.cpp" />
     <ClCompile Include="ImGUI-master\ImGUI\imgui.cpp" />
@@ -68,7 +67,6 @@
     <ClInclude Include="GameStateManager.h" />
     <ClInclude Include="GameState_Level.h" />
     <ClInclude Include="GameState_Selection.h" />
-    <ClInclude Include="GameState_WaitingRoom.h" />
     <ClInclude Include="GUI.h" />
     <ClInclude Include="ImGUI-master\ImGUI-SFML\imgui-SFML.h" />
     <ClInclude Include="ImGUI-master\ImGUI\imgui.h" />

@@ -36,7 +36,7 @@ public:
 	void SetTexture(std::string colour) override;
 
 	// Add a message to the player's network message queue
-	void AddTankInfo(const TankInfo& latestTanksInfo);
+	void AddLatestTankInfo(const TankInfo& latestTanksInfo);
 
 	// This method calculates and stores the position, but also returns it immediately for use in the main loop
 	// This is my where prediction would be... IF I HAD ANY

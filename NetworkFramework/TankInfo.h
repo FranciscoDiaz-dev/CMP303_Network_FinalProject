@@ -11,10 +11,10 @@ using std::string;
 struct TankInfo
 {
 	// constructors	
-	TankInfo() : id(-1), x(-1), y(-1), colour(""), time(-1.f) {}
-	TankInfo(int identifier) : id(identifier), x(-1), y(-1), colour(""), time(-1.f) {}
-	TankInfo(int identifier, float xPos, float yPos, string textureColour, float runTime) :
-		id(identifier), x(xPos), y(yPos), colour(textureColour), time(runTime) {}
+	TankInfo() : id(-1), x(0), y(0), colour(""), isBot(false), time(-1.f) {}
+	TankInfo(int identifier) : id(identifier), x(0), y(0), colour(""), isBot(false), time(-1.f) {}
+	TankInfo(int identifier, float xPos, float yPos, string textureColour, bool bot, float runTime) :
+		id(identifier), x(xPos), y(yPos), colour(textureColour), isBot(bot), time(runTime) {}
 
 	// components
 
@@ -26,6 +26,9 @@ struct TankInfo
 
 	// colour
 	string colour;
+
+	// This tank is a bot (it is not controlled by a machine
+	bool isBot;
 
 	/** The time at which this info was collected and/or message was sent
 	(Not the time at which it was received!) */
@@ -40,12 +43,5 @@ struct TankInfo
 sf::Packet& operator <<(sf::Packet& packet, const TankInfo& tankInfo);
 // From Packet to TankInfo
 sf::Packet& operator >>(sf::Packet& packet, TankInfo& tankInfo);
-
-// From std::vector<tankInfo> to Packet
-// vectors need to be initialised with the num of element to send/receive
-sf::Packet& operator <<(sf::Packet& packet, const std::vector<TankInfo>& tanksInfo);
-// From Packet to std::vector<tankInfo>
-// vectors need to be initialised with the num of element to send/receive
-sf::Packet& operator >>(sf::Packet& packet, std::vector<TankInfo>& tanksInfo);
 
 #endif // _PLAYER_INFO_H

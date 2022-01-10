@@ -116,7 +116,7 @@ int main()
 	NetworkSimulator netSimulator(sendRate, latency);
 	netSimulator.m_MyID = 0;	//On the network, we are Tank 0
 
-	ClientConnection clientConnection(&player, &gameId, &gameState);
+	ClientConnection clientConnection(&player, &enemiesMgr, &gameId, &gameState);
 	ServersListManager serversListMgr;
 
 	// Create SharedContext which it contains all the components we will need in the game states
@@ -153,7 +153,7 @@ int main()
 		// Calculate delta time. How much time has passed 
 		// since it was last calculated (in seconds) and restart the clock->
 		deltaTime = gameClock.restart();
-		
+
 		// Call standard game loop functions (input, update and render)
 		gameStateMgr.handleInput(deltaTime);	
 		gameStateMgr.update(deltaTime);
