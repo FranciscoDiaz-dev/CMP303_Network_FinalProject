@@ -21,17 +21,17 @@ void EnemiesManager::setEnemiesInfos(std::vector<TankInfo>& enemiesInfo)
 
 		// If the enemy exits on this client side and it contains an older information than 
 		// the one received then update it
-		if (enemy != nullptr && enemy->getTankInfo().time < enemyInfo.time) 
+		if (enemy != nullptr && enemy->GetTankInfo().time < enemyInfo.time) 
 		{
 			// save the latest info received
-			enemy->setTankInfo(enemyInfo);
+			enemy->SetTankInfo(enemyInfo);
 		}
 		// If the enemy has not been created yet on this client side
 		// then create it
 		else if(enemy == nullptr)
 		{
 			Enemy* newEnemy = new Enemy();
-			newEnemy->setTankInfo(enemyInfo);
+			newEnemy->SetTankInfo(enemyInfo);
 			enemies.insert(std::pair<int, Enemy*>(enemyInfo.id, newEnemy));
 		}
 	}

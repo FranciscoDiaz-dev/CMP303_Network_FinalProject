@@ -35,7 +35,7 @@ bool ClientConnection::joinAGame(ServerInfo newServerInfo)
 		playerMsgSent.gameId = *gameId;
 		playerMsgSent.requestType = int(RequestType::JOIN);
 		playerMsgSent.gState = int(gameState->getCurrentState());
-		playerMsgSent.tankInfo = player->getTankInfo();
+		playerMsgSent.tankInfo = player->GetTankInfo();
 
 		// Convert this message to sf::packet format and send it
 		sf::Packet packetSent, packetReceived;
@@ -57,7 +57,7 @@ bool ClientConnection::joinAGame(ServerInfo newServerInfo)
 				*gameId = playerMsgReceived.gameId;
 				// Update the player info
 				// which contain the new player id, new position etc (assigned by the server)
-				player->setTankInfo(playerMsgReceived.tankInfo);
+				player->SetTankInfo(playerMsgReceived.tankInfo);
 
 				// Save the server address
 				serverInfo = newServerInfo;
@@ -94,7 +94,7 @@ bool ClientConnection::exitTheGame()
 		playerMsgSent.gameId = *gameId;
 		playerMsgSent.requestType = int(RequestType::EXIT);
 		playerMsgSent.gState = int(gameState->getCurrentState());
-		playerMsgSent.tankInfo = player->getTankInfo();
+		playerMsgSent.tankInfo = player->GetTankInfo();
 
 		// Convert this message to sf::packet format and send it
 		sf::Packet packetSent, packetReceived;
@@ -140,7 +140,7 @@ bool ClientConnection::sendThisPlayerInfoToServer()
 	playerMsgSent.requestType = int(RequestType::UPDATE);
 	playerMsgSent.gState = int(gameState->getCurrentState());
 	playerMsgSent.numActiveEnemies = enemiesMgr->getNumActiveEnemies();
-	playerMsgSent.tankInfo = player->getTankInfo();
+	playerMsgSent.tankInfo = player->GetTankInfo();
 
 	// Convert this message to sf::packet format and send it
 	sf::Packet packetSent;

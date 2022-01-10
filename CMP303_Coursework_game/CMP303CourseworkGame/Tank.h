@@ -13,7 +13,7 @@ class Tank : public sf::Sprite
 {
 public:
 	// Constructor
-	Tank(bool isBot = false);
+	Tank();
 	// Destructor
 	~Tank();
 
@@ -28,9 +28,9 @@ public:
 	void SetPosition(sf::Vector2f pos);
 
 	// Return the tank info of this tank
-	TankInfo getTankInfo()const { return m_TankInfo; };
+	TankInfo GetTankInfo()const { return m_TankInfo; };
 	// Set the Tank info of this tank
-	void setTankInfo(TankInfo newTankInfo);
+	virtual void SetTankInfo(TankInfo newTankInfo);
 
 	// Set the texture(and colour) of this tank (barrel and body)
 	virtual void SetTexture(std::string colour);
@@ -42,13 +42,14 @@ public:
 	// Return this tank id
 	int GetId() { return m_TankInfo.id; };
 
-	void UpdateTime(float timeSinceLastUpdateRequest);
+	// Add one point to this player
+	void AddPoint();
 
 	// Reset all the tank info
 	virtual void Reset();
 
-	bool GetIsBot()const { return m_IsBot; };
-	void SetIsBot(bool isBot) { m_IsBot = isBot; };
+	bool GetIsBot()const { return m_TankInfo.isBot; };
+	void SetIsBot(bool isBot) { m_TankInfo.isBot = isBot; };
 
 protected:
 	// Tank components //
@@ -64,12 +65,9 @@ protected:
 	// Tank information used for rendering, network, etc
 	TankInfo m_TankInfo;
 
-	// Text and font to show the identifier of this tank on screen
-	sf::Text m_TankIdText;
+	// Text and font to show the identifier and score of this tank on screen
+	sf::Text m_TankIdText, m_TankScoreText;
 	sf::Font m_MontserratFont;
-
-	// to detect if it is a bot or not
-	bool m_IsBot;
 };
 
 #endif //_TANK_H

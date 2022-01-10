@@ -35,8 +35,8 @@ public:
 	// Set the texture(and colour) of this tank (barrel, body and the ghost)
 	void SetTexture(std::string colour) override;
 
-	// Add a message to the player's network message queue
-	void AddLatestTankInfo(const TankInfo& latestTanksInfo);
+	// Add a message to the enemy network message queue
+	void SetTankInfo(const TankInfo latestTanksInfo) override;
 
 	// This method calculates and stores the position, but also returns it immediately for use in the main loop
 	// This is my where prediction would be... IF I HAD ANY

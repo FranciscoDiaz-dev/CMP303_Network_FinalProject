@@ -1,8 +1,7 @@
 #include "Tank.h"
 
 
-Tank::Tank(bool isBot)
-	: m_IsBot(isBot), sf::Sprite()
+Tank::Tank() : sf::Sprite()
 {
 	// Initialise font and text
 	m_MontserratFont.loadFromFile("Assets/Montserrat-Regular.ttf");
@@ -12,6 +11,13 @@ Tank::Tank(bool isBot)
 	m_TankIdText.setOutlineThickness(1.f);
 	m_TankIdText.setCharacterSize(10);
 	m_TankIdText.setPosition(sf::Vector2f(250.0f, 20.0f));
+
+	m_TankScoreText.setFont(m_MontserratFont);
+	m_TankScoreText.setOutlineColor(sf::Color::Black);
+	m_TankScoreText.setOutlineThickness(1.f);
+	m_TankScoreText.setCharacterSize(10);
+	m_TankScoreText.setPosition(sf::Vector2f(250.0f, 20.0f));
+	//m_TankScoreText.setString("Score: " + std::to_string(m_TankInfo.score));
 }
 
 
@@ -30,21 +36,16 @@ void Tank::Update(float dt)
 	m_TankInfo.time += dt;
 }
 
-void Tank::UpdateTime(float timeSinceLastUpdateRequest)
-{
-	// move the tank if it is a bot
-	m_TankInfo.time += timeSinceLastUpdateRequest;
-}
-
 void Tank::Render(sf::RenderWindow* window)
 {
 	window->draw(*this);
 	window->draw(m_BarrelSprite);
 	window->draw(m_TankIdText);
+	window->draw(m_TankScoreText);
 }
 
 
-void Tank::setTankInfo(TankInfo newTankInfo)
+void Tank::SetTankInfo(TankInfo newTankInfo)
 {
 	// Check if this tank had another texture/colour
 	// if so then update it
@@ -59,13 +60,17 @@ void Tank::setTankInfo(TankInfo newTankInfo)
 	// Set Text
 	if (m_TankInfo.id != newTankInfo.id)
 	{
-		std::string tankText = "Player: " + std::to_string(newTankInfo.id);
+		std::string tankIdText = "Player: " + std::to_string(newTankInfo.id);
 
 		// add a suffix if it is a bot
-		if (m_IsBot)
-			tankText += " (bot)";
+		if (newTankInfo.isBot)
+			tankIdText += " (bot)";
 
-		m_TankIdText.setString(tankText);
+		m_TankIdText.setString(tankIdText);
+	}
+	if (m_TankInfo.score != newTankInfo.score)
+	{
+		m_TankScoreText.setString("Score: " + std::to_string(newTankInfo.score));
 	}
 
 	// update the full tank info variable/container
@@ -89,12 +94,18 @@ void Tank::SetTexture(std::string colour)
 	m_BarrelSprite.setPosition(sf::Sprite::getPosition());
 }
 
+void Tank::AddPoint()
+{
+	m_TankInfo.score++;
+	m_TankScoreText.setString("Score: " + std::to_string(m_TankInfo.score));
+}
+
 void Tank::Reset()
 {
 	// Set a new player info
-	setTankInfo(TankInfo());
+	SetTankInfo(TankInfo());
 
-	m_IsBot = false;
+	m_TankInfo.isBot = false;
 }
 
 void Tank::SetPosition(sf::Vector2f pos)
@@ -109,6 +120,7 @@ void Tank::SetPosition(sf::Vector2f pos)
 	m_TankInfo.x = pos.x;
 	m_TankInfo.y = pos.y;
 
-	// Set position of the text
-	m_TankIdText.setPosition(sf::Vector2f(pos.x + 20, pos.y - 30)); // up and right
+	// Set position of the texts
+	m_TankIdText.setPosition(sf::Vector2f(pos.x + 22, pos.y - 30)); // up and right
+	m_TankScoreText.setPosition(sf::Vector2f(pos.x + 22, pos.y - 18)); // up and right
 }

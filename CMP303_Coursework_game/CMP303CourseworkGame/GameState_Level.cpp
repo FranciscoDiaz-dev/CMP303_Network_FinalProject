@@ -27,6 +27,9 @@ sendUpdateRequestRate(0.5f), timeSinceLastUpdateRequest(sendUpdateRequestRate), 
 
 	// initialise title text
 	titleText.setString(" Game Level 1");
+
+	// make a first contact with the server
+	clientConnection->sendThisPlayerInfoToServer();
 }
 
 GameState_Level::~GameState_Level()
@@ -85,6 +88,11 @@ void GameState_Level::handleInput(sf::Time dt)
 
 		player->SetPosition(newPos);
 		clientConnection->sendThisPlayerInfoToServer();
+	}
+	else if (input->isKeyDown(sf::Keyboard::P))
+	{
+		input->setKeyUp(sf::Keyboard::P);
+		player->AddPoint();
 	}
 }
 

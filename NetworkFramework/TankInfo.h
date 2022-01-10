@@ -11,9 +11,9 @@ using std::string;
 struct TankInfo
 {
 	// constructors	
-	TankInfo() : id(-1), x(0), y(0), colour(""), isBot(false), time(-1.f) {}
-	TankInfo(int identifier) : id(identifier), x(0), y(0), colour(""), isBot(false), time(-1.f) {}
-	TankInfo(int identifier, float xPos, float yPos, string textureColour, bool bot, float runTime) :
+	TankInfo() : id(-1), x(0), y(0), colour(""), isBot(false), score(0), time(-1.f) {}
+	TankInfo(int identifier) : id(identifier), x(0), y(0), colour(""), isBot(false), score(0), time(-1.f) {}
+	TankInfo(int identifier, float xPos, float yPos, string textureColour, bool bot, int points, float runTime) :
 		id(identifier), x(xPos), y(yPos), colour(textureColour), isBot(bot), time(runTime) {}
 
 	// components
@@ -27,8 +27,11 @@ struct TankInfo
 	// colour
 	string colour;
 
-	// This tank is a bot (it is not controlled by a machine
+	// This tank is a bot (it is not controlled by a machine)
 	bool isBot;
+
+	// score this player has
+	int score;
 
 	/** The time at which this info was collected and/or message was sent
 	(Not the time at which it was received!) */

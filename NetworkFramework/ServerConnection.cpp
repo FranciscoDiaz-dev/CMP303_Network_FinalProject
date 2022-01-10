@@ -47,6 +47,8 @@ ServerConnection::~ServerConnection()
 
 void ServerConnection::run(sf::Time dt, sf::Time timeout)
 {
+	// Process all the received messages
+
 	// Make the selector wait for data on any socket
 	if (selector.wait(timeout))
 	{
@@ -57,39 +59,43 @@ void ServerConnection::run(sf::Time dt, sf::Time timeout)
 		processTcpRequests();
 
 		// Process UPD requests (Receiving updates)
-		processUdpRequests();	
+		processUdpRequests();
 	}
 
 	// UDP - SEND UPDATES TO ALL THE PLAYERS
 	// count the time since last send message update
-	timeSinceLastUpdateSent += dt.asMilliseconds();
-
-	// if it is time to send the info
-	if (sendUpdateRate <= timeSinceLastUpdateSent)
+	if (!activeGames.empty())
 	{
-		printf("Sending the most updated tanks infos (received by the server) to players.\n");
+		timeSinceLastUpdateSent += dt.asMilliseconds();
 
-		for (GameInfo* gameInfo : activeGames)
+		// if it is time to send the info
+		if (sendUpdateRate <= timeSinceLastUpdateSent)
 		{
-			// packet to send
-			sf::Packet packetToPlayer;
+			printf("Sending the most updated tanks infos (received by the server) to players.\n");
 
-			// Get all the tanks info and save them on sf::Packet
-			// this is the paket to be sent to all the players
-			for (PlayerData* playerData : gameInfo->playersData)
+			for (GameInfo* gameInfo : activeGames)
 			{
-				packetToPlayer << playerData->second;
+				// packet to send
+				sf::Packet packetToPlayer;
+
+				// Get all the tanks info and save them on sf::Packet
+				// this is the paket to be sent to all the players
+				for (PlayerData* playerData : gameInfo->playersData)
+				{
+					packetToPlayer << playerData->second;
+				}
+
+				// Send the most updated version of all the players to every player 
+				for (PlayerData* toPlayerData : gameInfo->playersData)
+				{
+					if (toPlayerData->first.ipAddr.toString() != "0.0.0.0")
+						udpSendMessage(packetToPlayer, toPlayerData->first);
+				}
 			}
 
-			// Send the most updated version of all the players to every player 
-			for (PlayerData* toPlayerData : gameInfo->playersData)
-			{
-				udpSendMessage(packetToPlayer, toPlayerData->first);
-			}
+			// reset the timer
+			timeSinceLastUpdateSent = 0.0f;
 		}
-
-		// reset the timer
-		timeSinceLastUpdateSent = 0.0f;
 	}
 }
 
@@ -229,7 +235,7 @@ void ServerConnection::processUdpRequests()
 		// If the player and game have been found and
 		// the message received is the most updated received
 		if (gameInfo != nullptr && playerData != nullptr &&
-			playerData->second.time < receivedPlayerMsg.tankInfo.time)
+			(playerData->second.time < receivedPlayerMsg.tankInfo.time || playerData->second.time == 0.0f))
 		{
 			// update player information on the server
 			playerData->first = fromSockAddr; // save the latest player sock address (it is useful in case the player address changes)

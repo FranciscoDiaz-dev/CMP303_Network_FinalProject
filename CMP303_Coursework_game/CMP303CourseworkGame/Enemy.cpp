@@ -56,10 +56,11 @@ void Enemy::SetTexture(std::string colour)
 	setGhostPosition(getPosition());
 }
 
-void Enemy::AddLatestTankInfo(const TankInfo& latestTanksInfo)
+void Enemy::SetTankInfo(const TankInfo latestTanksInfo)
 {
 	// update the tank info
-	setTankInfo(latestTanksInfo);
+	Tank::SetTankInfo(latestTanksInfo);
+
 	// add it to the collection
     m_Messages.push_back(latestTanksInfo);
 
