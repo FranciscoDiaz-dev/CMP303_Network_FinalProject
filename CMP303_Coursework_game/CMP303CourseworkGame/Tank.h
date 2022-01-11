@@ -52,6 +52,11 @@ public:
 	string GetName()const { return m_TankInfo.name; };
 	void SetName(string playerName) { m_TankInfo.name = playerName; m_TankNameText.setString(m_TankInfo.name);};
 
+	// get speed of this tank
+	float GetSpeed() { return m_Speed; }
+	// set speed of this tank
+	void SetSpeed(float speed) { m_Speed = speed; }
+
 protected:
 	// Tank components //
 	// Body
@@ -65,6 +70,7 @@ protected:
 
 	// Tank information used for rendering, network, etc
 	TankInfo m_TankInfo;
+	float m_Speed;
 
 	// Text and font to show the identifier and score of this tank on screen
 	sf::Text m_TankNameText, m_TankScoreText;

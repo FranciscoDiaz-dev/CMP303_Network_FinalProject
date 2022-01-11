@@ -8,7 +8,7 @@
 
 ClientConnection::ClientConnection(Tank* tank, EnemiesManager* enemiesManager, int* currentGameId, GameState* currentGameState)
 	: player(tank), enemiesMgr(enemiesManager), gameId(currentGameId), gameState(currentGameState),
-	fakeLatency(0.0f), lastTankInfoTimeReceived(-1.0f), ConnectionBase()
+	lastTankInfoTimeReceived(-1.0f), ConnectionBase()
 {
 	udpSocket.setBlocking(false);
 }
@@ -213,6 +213,5 @@ bool ClientConnection::getEnemiesInfos(float dt)
 
 void ClientConnection::reset()
 {
-	fakeLatency = 0.0f;
 	lastTankInfoTimeReceived = -1.0f;
 }

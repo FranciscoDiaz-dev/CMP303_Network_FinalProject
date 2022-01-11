@@ -132,11 +132,11 @@ void GUI::render()
 				player->SetName(playerName);
 			}
 		}
-		int fakeLatency = clientConnection->getFakeLatency();
-		if (ImGui::InputInt("Fake Latency (ms)", &fakeLatency))
+		int playerSpeed = player->GetSpeed();
+		if (ImGui::InputInt("Player Speed", &playerSpeed))
 		{
-			if(clientConnection->getFakeLatency() != fakeLatency);
-				clientConnection->setFakeLatency(fakeLatency);
+			if(player->GetSpeed() != playerSpeed);
+				player->SetSpeed(playerSpeed);
 		}
 
 		if (textTimeout <= 0.0f && ImGui::Button("Find a game"))

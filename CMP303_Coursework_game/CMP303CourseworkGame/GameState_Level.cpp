@@ -62,7 +62,7 @@ void GameState_Level::handleInput(sf::Time dt)
 	else if (input->isKeyDown(sf::Keyboard::W) || input->isKeyDown(sf::Keyboard::A)  ||
 		input->isKeyDown(sf::Keyboard::S) || input->isKeyDown(sf::Keyboard::D))
 	{
-		float speed = 140.0f;
+		float speed = player->GetSpeed();
 		float velocity = speed * dt.asSeconds();
 		sf::Vector2f currentPos = player->getPosition();
 		sf::Vector2f newPos = currentPos;

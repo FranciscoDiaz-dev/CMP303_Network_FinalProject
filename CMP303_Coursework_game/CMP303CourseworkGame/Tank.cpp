@@ -1,7 +1,8 @@
 #include "Tank.h"
 
 
-Tank::Tank() : sf::Sprite()
+Tank::Tank() 
+	: m_Speed(160.0f), sf::Sprite()
 {
 	// Initialise font and text
 	m_MontserratFont.loadFromFile("Assets/Montserrat-Regular.ttf");

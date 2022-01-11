@@ -39,9 +39,6 @@ public:
 	// return true they have received
 	bool getEnemiesInfos(float dt);
 
-	int getFakeLatency()const { return fakeLatency; };
-	void setFakeLatency(int latency) { fakeLatency = latency; }
-
 	void reset();
 
 private:
@@ -55,7 +52,6 @@ private:
 
 	// variable to control the udp on client side (first filter)
 	float lastTankInfoTimeReceived;
-	int fakeLatency; // ms  - fake latency when the player is sending an update tank info to the server
 };
 
 #endif // _CLIENT_CONNECTION_H
