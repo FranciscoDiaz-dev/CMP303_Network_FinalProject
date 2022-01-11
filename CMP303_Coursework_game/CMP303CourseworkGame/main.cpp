@@ -12,7 +12,6 @@
 #include <iostream>
 #include "Framework/Input.h"
 #include "GameStateManager.h"
-#include "NetworkSimulator.h"
 #include "../../NetworkFramework/ServersListManager.h"
 #include "../../NetworkFramework/ClientConnection.h"
 #include "EnemiesManager.h"
@@ -111,11 +110,6 @@ int main()
 	int gameId = -1;
 
 	//Create a network simulator with that "sends" a message every 0.5 seconds and has a latency of 0.3 seconds
-	float sendRate = 0.5f;
-	float latency = 0.3f;
-	NetworkSimulator netSimulator(sendRate, latency);
-	netSimulator.m_MyID = 0;	//On the network, we are Tank 0
-
 	ClientConnection clientConnection(&player, &enemiesMgr, &gameId, &gameState);
 	ServersListManager serversListMgr;
 
@@ -126,7 +120,6 @@ int main()
 	sharedContext.kMinWindowHeight = &kMinWindowHeight;
 	sharedContext.window = &window;
 	sharedContext.input = &input;
-	sharedContext.netSimulator = &netSimulator;
 	sharedContext.gameState = &gameState;
 	sharedContext.serversListMgr = &serversListMgr;
 	sharedContext.player = &player;

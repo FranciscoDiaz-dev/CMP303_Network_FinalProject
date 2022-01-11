@@ -45,9 +45,6 @@
     <ClCompile Include="Tank.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NetworkSimulator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Framework\Input.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
@@ -99,7 +96,7 @@
     <ClCompile Include="..\..\NetworkFramework\ClientConnection.cpp">
       <Filter>NetworkFramework</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\NetworkFramework\ConnectionMessage.cpp">
+    <ClCompile Include="..\..\NetworkFramework\PlayerMessage.cpp">
       <Filter>NetworkFramework</Filter>
     </ClCompile>
     <ClCompile Include="..\..\NetworkFramework\TankInfo.cpp">
@@ -117,14 +114,8 @@
     <ClCompile Include="EnemiesManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\NetworkFramework\RequestType.cpp">
-      <Filter>NetworkFramework</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="NetworkSimulator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Framework\Input.h">
       <Filter>Framework</Filter>
     </ClInclude>
@@ -161,7 +152,7 @@
     <ClInclude Include="..\..\NetworkFramework\ConnectionBase.h">
       <Filter>NetworkFramework</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NetworkFramework\ConnectionMessage.h">
+    <ClInclude Include="..\..\NetworkFramework\PlayerMessage.h">
       <Filter>NetworkFramework</Filter>
     </ClInclude>
     <ClInclude Include="..\..\NetworkFramework\GameInfo.h">

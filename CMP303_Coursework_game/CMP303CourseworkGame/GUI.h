@@ -2,6 +2,10 @@
 #define _GUI_H
 #pragma once
 
+// GUI
+// Contains the ImGui static functions
+// It is used as a way of configurate for this project
+
 #include <vector>
 #include <string>
 #include <SFML/Graphics.hpp>
@@ -12,6 +16,7 @@ class ServersListManager;
 class GameState;
 class Tank;
 class ClientConnection;
+class EnemiesManager;
 
 
 using std::string;
@@ -43,8 +48,10 @@ private:
 	ServersListManager* serversListMgr;
 	ClientConnection* clientConnection;
 	Tank* player;
+	EnemiesManager* enemiesMgr;
 	GameState* gameState;
 	int* gameId;
+	float* fakeLatency;
 
 	// servers available
 	vector<string> serversList;
@@ -53,6 +60,10 @@ private:
 	// player colours available
 	vector<string> playerColours;
 	int selectedColourIndex;
+
+	// types of predictions for the enemies
+	vector<string> enemyPredictionTypes;
+	int selectedPredictionTypeIndex;
 
 	float textTimeout; // seconds
 	string timeoutText;

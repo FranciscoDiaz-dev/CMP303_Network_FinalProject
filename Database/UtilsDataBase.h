@@ -2,6 +2,10 @@
 #define _UTILS_DATABASE_H
 #pragma once
 
+// Utils DataBase
+// It is used for reading from the database (excel file)
+// where the servers info are saved
+
 #include <string>
 
 class UtilsDataBase {

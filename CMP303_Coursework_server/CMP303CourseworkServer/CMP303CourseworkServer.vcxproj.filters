@@ -48,9 +48,6 @@
     <ClCompile Include="Framework\Vector.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
-    <ClCompile Include="Utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GameState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -84,7 +81,7 @@
     <ClCompile Include="..\..\NetworkFramework\ServerConnection.cpp">
       <Filter>NetworkFramework</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\NetworkFramework\ConnectionMessage.cpp">
+    <ClCompile Include="..\..\NetworkFramework\PlayerMessage.cpp">
       <Filter>NetworkFramework</Filter>
     </ClCompile>
     <ClCompile Include="..\..\NetworkFramework\ServersListManager.cpp">
@@ -96,9 +93,6 @@
     <ClCompile Include="..\..\NetworkFramework\TankInfo.cpp">
       <Filter>NetworkFramework</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\NetworkFramework\RequestType.cpp">
-      <Filter>NetworkFramework</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Framework\Input.h">
@@ -106,9 +100,6 @@
     </ClInclude>
     <ClInclude Include="Framework\Vector.h">
       <Filter>Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GameState.h">
       <Filter>Header Files</Filter>
@@ -125,7 +116,7 @@
     <ClInclude Include="..\..\NetworkFramework\ConnectionBase.h">
       <Filter>NetworkFramework</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\NetworkFramework\ConnectionMessage.h">
+    <ClInclude Include="..\..\NetworkFramework\PlayerMessage.h">
       <Filter>NetworkFramework</Filter>
     </ClInclude>
     <ClInclude Include="..\..\NetworkFramework\ServerConnection.h">

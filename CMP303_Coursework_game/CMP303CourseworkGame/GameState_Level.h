@@ -1,12 +1,11 @@
-// Game State Level
-// It is the "real game", where the player/s can play with its/their characters
-// Game State Leve extend Game State Base,
-// Contains the scenery manager, player manager, camera, parallax manager (System movement).
-// @author Francisco Diaz (@FMGameDev)
-
 #ifndef _GAMESTATE_LEVEL_H
 #define _GAMESTATE_LEVEL_H
 #pragma once
+
+// Game State Level
+// It is the "real game", where the player can play with its character
+// Game State Leve extend Game State Base,
+// @author Francisco Diaz (@FMGameDev)
 
 #include "GameStateBase.h"
 #include "GameStateManager.h"
@@ -33,11 +32,6 @@ public:
 	void render() override;
 
 private:
-	
-	// function to check if it is game over
-	// if it is, the level will be added to remove and the game over game state will be displayed
-	void goToGameOver();
-
 	// Players
 	Tank* player;
 	EnemiesManager* enemiesMgr;
@@ -45,9 +39,6 @@ private:
 	// Floor
 	sf::Texture floorTexture;
 	sf::Sprite floor;
-
-	float sendUpdateRequestRate;
-	float timeSinceLastUpdateRequest;
 };
 
-#endif _GAMESTATE_LEVEL_H
+#endif //_GAMESTATE_LEVEL_H

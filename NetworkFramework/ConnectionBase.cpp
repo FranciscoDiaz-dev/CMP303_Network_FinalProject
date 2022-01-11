@@ -6,7 +6,6 @@ ConnectionBase::ConnectionBase()
 
 ConnectionBase::~ConnectionBase()
 {
-	// We won't actually get here, but if we did then we'd want to clean up...
 	printf("Quitting\n");
 }
 
@@ -53,7 +52,7 @@ bool ConnectionBase::udpReceiveMessage(sf::Packet* packet, SockAddr* fromSockAdd
 	if (alreadyWaited || selector.wait(timeout))
 	{
 		// Test if we have to read 
-		if ( selector.isReady(udpSocket) || !udpSocket.isBlocking())
+		if (!udpSocket.isBlocking() || selector.isReady(udpSocket))
 		{
 			printf("UDP Reading Message: ");
 

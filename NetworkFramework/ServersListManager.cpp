@@ -93,3 +93,12 @@ ServerInfo ServersListManager::getServerInfoById(string serverId) const
         return ServerInfo();
     }
 }
+
+void ServersListManager::updateServerInfoById(string serverId, ServerInfo& serverInfo)
+{
+    auto server = infoServers.find(serverId);
+    if (server != infoServers.end())
+    {
+       server->second = serverInfo;
+    }
+}

@@ -1,4 +1,4 @@
-#include "ConnectionMessage.h"
+#include "PlayerMessage.h"
 
 sf::Packet& operator <<(sf::Packet& packet, const PlayerMessage& playerMsg)
 {

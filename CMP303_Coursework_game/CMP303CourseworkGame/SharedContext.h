@@ -23,7 +23,6 @@
 // They must been initialise in the Game App or any of the mains
 
 class Input;
-class NetworkSimulator;
 class GameState;
 class GUI;
 class Tank;
@@ -41,7 +40,8 @@ struct SharedContext
 {
 	// constructor
 	SharedContext() : kGameName(nullptr), kMinWindowWith(nullptr), kMinWindowHeight(nullptr),
-		window(nullptr), input(nullptr), serversListMgr(nullptr), player(nullptr), enemiesMgr(nullptr), netSimulator(nullptr), gameState(nullptr), clientConnection(nullptr), gameId(nullptr), gui(nullptr) {}
+		window(nullptr), input(nullptr), serversListMgr(nullptr), player(nullptr), enemiesMgr(nullptr),
+		gameState(nullptr), clientConnection(nullptr), gameId(nullptr), gui(nullptr){}
 
 	// components
 	const sf::String* kGameName; // name of the game, used in the window game
@@ -49,10 +49,10 @@ struct SharedContext
 	const unsigned int* kMinWindowHeight;
 	sf::RenderWindow* window; // window component
 	Input* input; // imput component
-	NetworkSimulator* netSimulator;
 	ServersListManager* serversListMgr;
 	ClientConnection* clientConnection;
 	EnemiesManager* enemiesMgr;
+
 	Tank* player;
 	GameState* gameState; // game state component which contains the current game state
 	int* gameId;

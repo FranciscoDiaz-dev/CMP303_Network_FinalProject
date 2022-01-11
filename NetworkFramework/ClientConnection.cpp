@@ -1,5 +1,5 @@
 #include "ClientConnection.h"
-#include "ConnectionMessage.h"
+#include "PlayerMessage.h"
 #include "RequestType.h"
 
 #include "../CMP303_Coursework_game/CMP303CourseworkGame/EnemiesManager.h"
@@ -7,7 +7,8 @@
 #include "../CMP303_Coursework_game/CMP303CourseworkGame/Framework/Vector.h"
 
 ClientConnection::ClientConnection(Tank* tank, EnemiesManager* enemiesManager, int* currentGameId, GameState* currentGameState)
-	: player(tank), enemiesMgr(enemiesManager), gameId(currentGameId), gameState(currentGameState), ConnectionBase()
+	: player(tank), enemiesMgr(enemiesManager), gameId(currentGameId), gameState(currentGameState),
+	fakeLatency(0.0f), lastTankInfoTimeReceived(-1.0f), ConnectionBase()
 {
 	udpSocket.setBlocking(false);
 }
@@ -146,10 +147,6 @@ bool ClientConnection::sendThisPlayerInfoToServer()
 	sf::Packet packetSent;
 	packetSent << playerMsgSent;
 
-	// create the objects where the player infos will be saved
-	TankInfo tankInfoReceived;
-	std::vector<TankInfo> tanksInfoReceived;
-
 	// The server socket address, and the object where the server address response will be saved
 	SockAddr serverUDPSockAddr(serverInfo.ipAddr, serverInfo.udpPort);
 
@@ -160,7 +157,7 @@ bool ClientConnection::sendThisPlayerInfoToServer()
 		return false;
 }
 
-std::vector<TankInfo> ClientConnection::getEnemiesInfos()
+bool ClientConnection::getEnemiesInfos(float dt)
 { 
 	// create the objects where the player infos will be saved
 	sf::Packet packetReceived;
@@ -178,10 +175,44 @@ std::vector<TankInfo> ClientConnection::getEnemiesInfos()
 			tanksInfoReceived.push_back(tankInfoReceived);
 		}
 
-		// remove this player from the list
+		// Find this player info
 		if(!tanksInfoReceived.empty())
-			tanksInfoReceived.erase(tanksInfoReceived.begin() + player->GetId()); // remove this player from the collection
+		{
+			int playerIndex = -1;
+			for (int i = 0; i < int(tanksInfoReceived.size()); i++)
+			{
+				// if player found then save its localitation
+				if (tanksInfoReceived.at(i).id == player->GetId())
+				{
+					playerIndex = i;
+					break; // end the loop
+				}
+			}
+
+			// check this this collection of tankInfo is the most updated received by the server		
+			if (playerIndex != -1 && tanksInfoReceived.at(playerIndex).time >= lastTankInfoTimeReceived)
+			{	
+				// update the last tank info time received (This is the udp first filtering on client side)
+				// taking as reference this player time which the server had when it sent all the tanks info
+				lastTankInfoTimeReceived = tanksInfoReceived.at(playerIndex).time;
+
+				// delete the player info so the vector will only contain enemies info
+				tanksInfoReceived.erase(tanksInfoReceived.begin() + playerIndex);
+
+				enemiesMgr->updateEnemiesInfos(tanksInfoReceived);
+
+				return true;
+			}
+		}
 	}
 
-	return tanksInfoReceived;
+	enemiesMgr->updatesNotReceived(dt);
+
+	return false;
+}
+
+void ClientConnection::reset()
+{
+	fakeLatency = 0.0f;
+	lastTankInfoTimeReceived = -1.0f;
 }

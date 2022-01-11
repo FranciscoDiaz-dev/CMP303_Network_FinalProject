@@ -2,6 +2,10 @@
 #define _GUI_H
 #pragma once
 
+// GUI
+// Contains the ImGui static functions
+// It is used as a way of configurate for this project
+
 #include <vector>
 #include <string>
 #include <SFML\Graphics.hpp>

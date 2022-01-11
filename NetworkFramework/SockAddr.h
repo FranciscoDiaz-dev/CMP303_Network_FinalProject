@@ -2,6 +2,10 @@
 #define _SOCK_ADDR_H
 #pragma once
 
+// Socket Address
+// It contains the ip and port for a sfml socket
+// Useful for containing the data organised
+
 #include <SFML\Network.hpp>
 
 struct SockAddr

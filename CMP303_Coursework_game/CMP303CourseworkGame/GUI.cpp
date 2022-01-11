@@ -9,6 +9,7 @@
 #include "..\..\NetworkFramework\ServersListManager.h"
 #include "..\..\NetworkFramework\ClientConnection.h"
 #include "Tank.h"
+#include "EnemiesManager.h"
 #include "GameStateManager.h"
 
 
@@ -45,6 +46,7 @@ namespace ImGui
 GUI::GUI(GameStateManager* gameStateMgr) :
 	selectedServerIndex(0),
 	selectedColourIndex(0),
+	selectedPredictionTypeIndex(0),
 	textTimeout(0.0f),
 	gameStateMgr(gameStateMgr)
 {
@@ -52,6 +54,7 @@ GUI::GUI(GameStateManager* gameStateMgr) :
 	window = gameStateMgr->getSharedContext()->window;
 	serversListMgr = gameStateMgr->getSharedContext()->serversListMgr;
 	player = gameStateMgr->getSharedContext()->player;
+	enemiesMgr = gameStateMgr->getSharedContext()->enemiesMgr;
 	gameId = gameStateMgr->getSharedContext()->gameId;
 	gameState = gameStateMgr->getSharedContext()->gameState;
 	clientConnection = gameStateMgr->getSharedContext()->clientConnection;
@@ -63,8 +66,11 @@ GUI::GUI(GameStateManager* gameStateMgr) :
 	playerColours = {"black", "blue", "green", "red"}; // player colours available
 	player->SetTexture(playerColours.at(selectedColourIndex));
 
+	enemyPredictionTypes = { "none", "linear", "Quadratic" }; // it must be in the same order as in the enum
+	enemiesMgr->setPredictionType(selectedPredictionTypeIndex);
+
 	// Update the player position
-	player->SetPosition(sf::Vector2f(450.0f, 300.0f));
+	player->SetPosition(sf::Vector2f(320.0f, 320.0f));
 
 	ImGui::SFML::Init(*window);
 }
@@ -108,14 +114,29 @@ void GUI::render()
 			}
 		}
 
-		bool isBot = player->GetIsBot();
-		if (ImGui::Checkbox("Is a bot", &isBot))
+		// Choosing Enemies prediction type of calculation
+		if (ImGui::Combo("Enemies Prediction Mode", &selectedPredictionTypeIndex, enemyPredictionTypes))
 		{
-			// if the new value is different from the one it currently has then change it
-			if (isBot != player->GetIsBot())
+			// Apply change
+			if (enemiesMgr->getPredictionType() != selectedPredictionTypeIndex)
 			{
-				player->SetIsBot(isBot);
+				enemiesMgr->setPredictionType(selectedPredictionTypeIndex);
 			}
+		}
+		string playerName = player->GetName();
+		if (ImGui::InputText("Player Name", &playerName))
+		{
+			// Apply change
+			if (player->GetName() != playerName)
+			{
+				player->SetName(playerName);
+			}
+		}
+		int fakeLatency = clientConnection->getFakeLatency();
+		if (ImGui::InputInt("Fake Latency (ms)", &fakeLatency))
+		{
+			if(clientConnection->getFakeLatency() != fakeLatency);
+				clientConnection->setFakeLatency(fakeLatency);
 		}
 
 		if (textTimeout <= 0.0f && ImGui::Button("Find a game"))

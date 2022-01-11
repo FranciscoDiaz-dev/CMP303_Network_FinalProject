@@ -2,6 +2,11 @@
 #define _CLIENT_CONNECTION_H
 #pragma once
 
+// Client Connection
+// It extends from Connection Base
+// Add TCP functionality
+// It is used for UPD-TCP on the client side
+
 #include <vector>
 #include "ConnectionBase.h"
 #include "ServerInfo.h"
@@ -29,7 +34,15 @@ public:
 	// return the lastest players information saved/received on the server
 	bool sendThisPlayerInfoToServer();
 
-	std::vector<TankInfo> getEnemiesInfos();
+	// check if the server has sent the enemies info using udp
+	// if so update it (only if the receievd are the most updated we got)
+	// return true they have received
+	bool getEnemiesInfos(float dt);
+
+	int getFakeLatency()const { return fakeLatency; };
+	void setFakeLatency(int latency) { fakeLatency = latency; }
+
+	void reset();
 
 private:
 	ServerInfo serverInfo; // server information
@@ -39,6 +52,10 @@ private:
 	EnemiesManager* enemiesMgr;
 	int* gameId;
 	GameState* gameState;
+
+	// variable to control the udp on client side (first filter)
+	float lastTankInfoTimeReceived;
+	int fakeLatency; // ms  - fake latency when the player is sending an update tank info to the server
 };
 
 #endif // _CLIENT_CONNECTION_H

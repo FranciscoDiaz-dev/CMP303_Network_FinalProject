@@ -1,12 +1,12 @@
+#ifndef _GAMESTATE_SELECTION_H
+#define _GAMESTATE_SELECTION_H
+#pragma once
+
 // Game State Selection
 // It is the "real game", where the player/s can play with its/their characters
 // Game State Leve extend Game State Base,
 // Contains the scenery manager, player manager, camera, parallax manager (System movement).
 // @author Francisco Diaz (@FMGameDev)
-
-#ifndef _GAMESTATE_SELECTION_H
-#define _GAMESTATE_SELECTION_H
-#pragma once
 
 #include <vector>
 #include "GameStateBase.h"

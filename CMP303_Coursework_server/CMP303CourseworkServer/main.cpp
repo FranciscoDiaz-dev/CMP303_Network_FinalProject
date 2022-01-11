@@ -94,7 +94,7 @@ int main()
 {
 	// Create Objects to shared in the game states
 	const sf::String kWindowName = "CMP303 - Coursework by Francisco Diaz (1902654) - SERVER";
-	const unsigned int kMinWindowWith = 640;
+	const unsigned int kMinWindowWith = 840;
 	const unsigned int kMinWindowHeight = 480;
 	sf::RenderWindow window(sf::VideoMode(kMinWindowWith, kMinWindowHeight), kWindowName);
 	window.setFramerateLimit(60);	//Request 60 frames per second
@@ -114,7 +114,7 @@ int main()
 	debugText.setOutlineColor(sf::Color::Black);
 	debugText.setOutlineThickness(1.f);
 	debugText.setCharacterSize(20);
-	debugText.setPosition(sf::Vector2f(250.0f, 20.0f));
+	debugText.setPosition(sf::Vector2f(420.0f, 30.0f));
 
 	// Create SharedContext which it contains all the components we will need in the game states
 	SharedContext sharedContext;

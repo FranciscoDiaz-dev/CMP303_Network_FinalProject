@@ -74,6 +74,9 @@ void GUI::render()
 {
 	ImGui::Begin("Server Settings"); // begin window
 
+		// Show Selected Server Details
+		ServerInfo selectedServerInfo = serversListMgr->getServerInfoById(servers.at(selectedServerIndex));
+
 
 		// Show list for choosing server if it has not already been choosen
 		if (sharedContext->serverConnection == nullptr)
@@ -85,11 +88,20 @@ void GUI::render()
 			if (ImGui::Combo("Servers", &selectedServerIndex, servers))
 			{
 			}
-
+			int sendUpdateRate = selectedServerInfo.sendUpdateRate;
+			if (ImGui::InputInt("Send Update Rate (ms)", &sendUpdateRate))
+			{
+				selectedServerInfo.sendUpdateRate = sendUpdateRate;
+				serversListMgr->updateServerInfoById(servers.at(selectedServerIndex), selectedServerInfo);
+			}
+			int fakeLatency = selectedServerInfo.fakeLatency;
+			if (ImGui::InputInt("Fake Latency (ms)", &fakeLatency))
+			{
+				selectedServerInfo.fakeLatency = fakeLatency;
+				serversListMgr->updateServerInfoById(servers.at(selectedServerIndex), selectedServerInfo);
+			}
 		}
 
-		// Show Selected Server Details
-		ServerInfo selectedServerInfo = serversListMgr->getServerInfoById(servers.at(selectedServerIndex));
 
 		if (selectedServerInfo.name != "")
 		{
@@ -99,6 +111,11 @@ void GUI::render()
 			ImGui::Text(string("IP: " + selectedServerInfo.ipAddr.toString()).c_str());
 			ImGui::Text("UDP Port: %d", selectedServerInfo.udpPort);
 			ImGui::Text("TCP Listener Port: %d", selectedServerInfo.tcpListenerPort);
+			ImGui::Text("Max games can host: %d", selectedServerInfo.maxNumGames);
+			ImGui::Text("Max players per games can host: %d", selectedServerInfo.maxNumPlayersPerGame);
+			ImGui::Text("Send Update Rate: %d ms", int(selectedServerInfo.sendUpdateRate));
+			ImGui::Text("Fake Latency Send Update: %d ms", int(selectedServerInfo.fakeLatency));
+			ImGui::Text("Send Update Period (Rate + Latency): %d ms", int(selectedServerInfo.sendUpdateRate + selectedServerInfo.fakeLatency));
 			if(sharedContext->serverConnection != nullptr)
 				ImGui::Text("Status: Running");
 			ImGui::Text("\n");

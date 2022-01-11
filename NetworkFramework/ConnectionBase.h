@@ -2,6 +2,10 @@
 #define _CONNECTION_BASE_H
 #pragma once
 
+// Connection Base
+// It contain the main tcp and udp functions for using them on client and server 
+// It contains the udp socket which can be used as client and server socket and 
+// a selecto object for detecting if a socket is ready
 
 #include "SockAddr.h"
 #include <SFML\Network.hpp> // SFML Lib can't be static if we use sfml objt in this project classes

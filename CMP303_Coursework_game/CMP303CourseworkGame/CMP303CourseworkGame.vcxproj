@@ -22,8 +22,7 @@
     <ClCompile Include="..\..\Database\UtilsDataBase.cpp" />
     <ClCompile Include="..\..\NetworkFramework\ClientConnection.cpp" />
     <ClCompile Include="..\..\NetworkFramework\ConnectionBase.cpp" />
-    <ClCompile Include="..\..\NetworkFramework\ConnectionMessage.cpp" />
-    <ClCompile Include="..\..\NetworkFramework\RequestType.cpp" />
+    <ClCompile Include="..\..\NetworkFramework\PlayerMessage.cpp" />
     <ClCompile Include="..\..\NetworkFramework\TankInfo.cpp" />
     <ClCompile Include="..\..\NetworkFramework\ServersListManager.cpp" />
     <ClCompile Include="EnemiesManager.cpp" />
@@ -44,14 +43,13 @@
     <ClCompile Include="ImGUI-master\ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="ImGUI-master\ImGUI\misc\cpp\imgui_stdlib.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="NetworkSimulator.cpp" />
     <ClCompile Include="Tank.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Database\UtilsDataBase.h" />
     <ClInclude Include="..\..\NetworkFramework\ClientConnection.h" />
     <ClInclude Include="..\..\NetworkFramework\ConnectionBase.h" />
-    <ClInclude Include="..\..\NetworkFramework\ConnectionMessage.h" />
+    <ClInclude Include="..\..\NetworkFramework\PlayerMessage.h" />
     <ClInclude Include="..\..\NetworkFramework\GameInfo.h" />
     <ClInclude Include="..\..\NetworkFramework\RequestType.h" />
     <ClInclude Include="..\..\NetworkFramework\TankInfo.h" />
@@ -70,7 +68,6 @@
     <ClInclude Include="GUI.h" />
     <ClInclude Include="ImGUI-master\ImGUI-SFML\imgui-SFML.h" />
     <ClInclude Include="ImGUI-master\ImGUI\imgui.h" />
-    <ClInclude Include="NetworkSimulator.h" />
     <ClInclude Include="SharedContext.h" />
     <ClInclude Include="Tank.h" />
   </ItemGroup>

@@ -3,7 +3,8 @@
 
 
 ServerConnection::ServerConnection(string serverIdentifier, ServerInfo& serverInfo)
-	: serverId(serverIdentifier), sendUpdateRate(100), timeSinceLastUpdateSent(100), maxNumPlayersPerGame(4), maxNumGames(2), ConnectionBase()
+	: serverId(serverIdentifier), maxNumPlayersPerGame(serverInfo.maxNumPlayersPerGame), maxNumGames(serverInfo.maxNumGames),
+	sendUpdateRate(serverInfo.sendUpdateRate), fakeLatency(serverInfo.fakeLatency), timeSinceLastUpdateSent(serverInfo.sendUpdateRate), ConnectionBase()
 {
 	// Bind the UDP socket to the ip iddress and the udp port
 	if (udpSocket.bind(serverInfo.udpPort, serverInfo.ipAddr) != sf::Socket::Done)
@@ -63,13 +64,16 @@ void ServerConnection::run(sf::Time dt, sf::Time timeout)
 	}
 
 	// UDP - SEND UPDATES TO ALL THE PLAYERS
-	// count the time since last send message update
+	// check there are active games
 	if (!activeGames.empty())
 	{
+		// count the time since last send message update
 		timeSinceLastUpdateSent += dt.asMilliseconds();
 
 		// if it is time to send the info
-		if (sendUpdateRate <= timeSinceLastUpdateSent)
+		// The period of time of sending updates to the player is the usual send updtae rate
+		// plus the faked latency (which is used only for testing-this project propose)
+		if ((sendUpdateRate + fakeLatency) <= timeSinceLastUpdateSent)
 		{
 			printf("Sending the most updated tanks infos (received by the server) to players.\n");
 
@@ -88,7 +92,11 @@ void ServerConnection::run(sf::Time dt, sf::Time timeout)
 				// Send the most updated version of all the players to every player 
 				for (PlayerData* toPlayerData : gameInfo->playersData)
 				{
-					if (toPlayerData->first.ipAddr.toString() != "0.0.0.0")
+					// if the udp socket address of the player has been saved then send it
+					// This server save the player socket addr when the player contacts for first time throught udp
+					// and it is updated each time the player update its position throught udp so the server
+					// has always the latest udp address socket of the player
+					if (toPlayerData->first.ipAddr.toString() != "0.0.0.0") 
 						udpSendMessage(packetToPlayer, toPlayerData->first);
 				}
 			}
@@ -130,11 +138,12 @@ PlayerData* ServerConnection::createPlayerData(GameInfo* hostGame, TankInfo& new
 	// The current number of players will be the player id
 	// for example: if there are not player (numPlayers == 0)
 	// then the first player id of this game will be 0
-	newTankInfo.id = hostGame->numPlayers;
+	newTankInfo.id = hostGame->nextTankId;
 
 	// Step 2:
 	// Set initial player posity by its id
-	switch (newTankInfo.id)
+	// position on the depending what would be their position on the collection
+	switch (int(hostGame->playersData.size())) 
 	{
 	case 0:
 		newTankInfo.x = 40.0f;
@@ -281,7 +290,7 @@ void ServerConnection::processTcpRequests()
 
 		// The client has sent some data, we can receive it
 		sf::Packet receivedPacket;
-		if (tcpReceiveMessage(&receivedPacket, client))
+		if (tcpReceiveMessage(&receivedPacket, client), true)
 		{
 			PlayerMessage receivedPlayerMessage;
 			// transform the packet received to player message structure
@@ -358,7 +367,8 @@ void ServerConnection::processTcpJoinAGameRequest(PlayerMessage& receivedPlayerM
 		if (tcpSendMessage(sentPacket, client))
 		{
 			hostGame->playersData.push_back(newPlayerData);
-			hostGame->numPlayers += 1;
+			hostGame->numPlayers++;
+			hostGame->nextTankId++;
 
 			// set this client request as done (ready to be removed)
 			tcpRequestsToRemove.push_back(&client);

@@ -2,6 +2,11 @@
 #define _PLAYER_INFO_H
 #pragma once
 
+// Tank Info
+// Contain the most important information about a player
+// It is used as a part of the player message
+// The server send a group of this structure to the players using UDP
+
 #include <SFML/Network.hpp>
 #include <string>
 #include <vector>
@@ -11,12 +16,13 @@ using std::string;
 struct TankInfo
 {
 	// constructors	
-	TankInfo() : id(-1), x(0), y(0), colour(""), isBot(false), score(0), time(-1.f) {}
-	TankInfo(int identifier) : id(identifier), x(0), y(0), colour(""), isBot(false), score(0), time(-1.f) {}
-	TankInfo(int identifier, float xPos, float yPos, string textureColour, bool bot, int points, float runTime) :
-		id(identifier), x(xPos), y(yPos), colour(textureColour), isBot(bot), time(runTime) {}
+	TankInfo() : name("Player Name"), id(-1), x(0), y(0), colour(""), time(-1.f) {}
+	TankInfo(int identifier) : name(""), id(identifier), x(0), y(0), colour(""), time(-1.f) {}
+	TankInfo(string playerName, int identifier, float xPos, float yPos, string textureColour, float runTime) :
+		name(playerName), id(identifier), x(xPos), y(yPos), colour(textureColour), time(runTime) {}
 
 	// components
+	string name;
 
 	/** The object number of this player within the game world. */
 	int id;
@@ -26,12 +32,6 @@ struct TankInfo
 
 	// colour
 	string colour;
-
-	// This tank is a bot (it is not controlled by a machine)
-	bool isBot;
-
-	// score this player has
-	int score;
 
 	/** The time at which this info was collected and/or message was sent
 	(Not the time at which it was received!) */

@@ -16,8 +16,12 @@ public:
 	~EnemiesManager();
 
 	// update all the enemy info
-	void setEnemiesInfos(std::vector<TankInfo>& enemiesInfo);
+	// if the collection is empty (no new info received)
+	// then add the delta time to the variable which trackle this 
+	// if infos were received then reset the timer
+	void updateEnemiesInfos(std::vector<TankInfo> enemiesInfo);
 
+	// update all the enemies
 	void update(float dt);
 
 	// render the enemies
@@ -29,6 +33,12 @@ public:
 	// return the number of enemies which are activated
 	int getNumActiveEnemies();
 
+	// add to the timer
+	void updatesNotReceived(float dt) { timeSinceLastTankInfoReceived += dt;};
+
+	int getPredictionType() { return int(predictionType); };
+	void setPredictionType(int predictionTypeInt) { predictionType = PredictionType(predictionTypeInt); };
+
 private:
 	// colelction of enemies
 	// ordered by its id
@@ -38,6 +48,9 @@ private:
 	// return nullptr if it is not found
 	Enemy* findEnemyById(int id);
 
+	// prediction type of the enemies
+	PredictionType predictionType;
+	float timeSinceLastTankInfoReceived;
 };
 
 #endif //_ENEMIES_MANAGER_H

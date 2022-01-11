@@ -1,6 +1,10 @@
-#ifndef _CONNECTION_MESSAGE_H
-#define _CONNECTION_MESSAGE_H
+#ifndef _PLAYER_MESSAGE_H
+#define _PLAYER_MESSAGE_H
 #pragma once
+
+// Player Message
+// It is the type of data the player send to the server (on tcp and udp)
+// and this return to them (on tcp)
 
 #include <SFML/Network.hpp>
 #include "TankInfo.h"
@@ -33,4 +37,4 @@ struct PlayerMessage
 sf::Packet& operator <<(sf::Packet& packet, const PlayerMessage& playerMsg);
 sf::Packet& operator >>(sf::Packet& packet, PlayerMessage& playerMsg);
 
-#endif //  _CONNECTION_MESSAGE_H
+#endif //  _PLAYER_MESSAGE_H

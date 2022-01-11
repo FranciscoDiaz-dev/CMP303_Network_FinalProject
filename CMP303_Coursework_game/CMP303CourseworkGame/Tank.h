@@ -2,11 +2,15 @@
 #define _TANK_H
 #pragma once
 
+// Tank
+// It is the player object
+// It contains a tank info object which is used for the messages to the server
+
 #include <SFML\Graphics.hpp>
 #include <vector>
 #include <string>
 #include "../../NetworkFramework/TankInfo.h"
-#include "../../NetworkFramework/ConnectionMessage.h"
+#include "../../NetworkFramework/PlayerMessage.h"
 
 
 class Tank : public sf::Sprite
@@ -42,14 +46,11 @@ public:
 	// Return this tank id
 	int GetId() { return m_TankInfo.id; };
 
-	// Add one point to this player
-	void AddPoint();
-
 	// Reset all the tank info
 	virtual void Reset();
 
-	bool GetIsBot()const { return m_TankInfo.isBot; };
-	void SetIsBot(bool isBot) { m_TankInfo.isBot = isBot; };
+	string GetName()const { return m_TankInfo.name; };
+	void SetName(string playerName) { m_TankInfo.name = playerName; m_TankNameText.setString(m_TankInfo.name);};
 
 protected:
 	// Tank components //
@@ -66,7 +67,7 @@ protected:
 	TankInfo m_TankInfo;
 
 	// Text and font to show the identifier and score of this tank on screen
-	sf::Text m_TankIdText, m_TankScoreText;
+	sf::Text m_TankNameText, m_TankScoreText;
 	sf::Font m_MontserratFont;
 };
 

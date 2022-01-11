@@ -1,11 +1,11 @@
-#include "ConnectionMessage.h"
+#include "TankInfo.h"
 
 sf::Packet& operator <<(sf::Packet& packet, const TankInfo& tankInfo)
 {
-	return packet << tankInfo.id << tankInfo.x << tankInfo.y << tankInfo.colour << tankInfo.isBot << tankInfo.score << tankInfo.time;
+	return packet << tankInfo.name << tankInfo.id << tankInfo.x << tankInfo.y << tankInfo.colour << tankInfo.time;
 }
 
 sf::Packet& operator >>(sf::Packet& packet, TankInfo& tankInfo)
 {
-	return packet >> tankInfo.id >> tankInfo.x >> tankInfo.y >> tankInfo.colour >> tankInfo.isBot >> tankInfo.score >> tankInfo.time;
+	return packet >> tankInfo.name >> tankInfo.id >> tankInfo.x >> tankInfo.y >> tankInfo.colour >> tankInfo.time;
 }

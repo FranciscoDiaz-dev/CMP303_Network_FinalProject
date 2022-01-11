@@ -1,12 +1,11 @@
-// Game State Base
-// All of the game states will extend of Game state Base
-// This class has mainly all the game basic functions (handleInput, update and render), a label, gameStateMgr object
-// also it has a window, audio manager and input component which is obtained from the sharedContext of GameStateManager (just to keep clean and minimize the code) 
-// @author Francisco Diaz (@FMGameDev)
-
 #ifndef _GAMESTATEBASE_H
 #define _GAMESTATEBASE_H
 #pragma once
+
+// Game State Base
+// All of the game states will extend of Game state Base
+// This class has mainly all the game basic functions (handleInput, update and render),  gameStateMgr object
+// @author Francisco Diaz (@FMGameDev)
 
 #include <SFML/Graphics.hpp>
 #include "SharedContext.h"

@@ -8,7 +8,7 @@
 #include "ConnectionBase.h"
 #include "GameInfo.h"
 #include "ServerInfo.h"
-#include "ConnectionMessage.h"
+#include "PlayerMessage.h"
 
 using std::string;
 
@@ -32,7 +32,6 @@ private:
 	string serverId;
 	int maxNumPlayersPerGame;
 	int maxNumGames;
-
 
 	/* Server Data */
 	std::vector<GameInfo*> activeGames;
@@ -64,8 +63,9 @@ private:
 	// Process Update a Game (UP request)
 	void processUdpRequests();
 
-	float sendUpdateRate = 100.0f; //ms
-	float timeSinceLastUpdateSent = 0.0f; //ms
+	float sendUpdateRate; //ms
+	float fakeLatency; //ms
+	float timeSinceLastUpdateSent; //ms
 
 
 	/* TCP */

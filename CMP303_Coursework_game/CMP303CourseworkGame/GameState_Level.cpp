@@ -5,8 +5,7 @@
 #include "Tank.h"
 #include "EnemiesManager.h"
 
-GameState_Level::GameState_Level(GameStateManager* stateMgr) : 
-sendUpdateRequestRate(0.5f), timeSinceLastUpdateRequest(sendUpdateRequestRate), GameStateBase(stateMgr)
+GameState_Level::GameState_Level(GameStateManager* stateMgr) : GameStateBase(stateMgr)
 {
 	// get the pointer to the player and enemies manager 
 	player = gameStateMgr->getSharedContext()->player;
@@ -26,7 +25,7 @@ sendUpdateRequestRate(0.5f), timeSinceLastUpdateRequest(sendUpdateRequestRate), 
 	floor.setTextureRect(sf::IntRect(0, 0, 640, 480));
 
 	// initialise title text
-	titleText.setString(" Game Level 1");
+	titleText.setString(" Game Level");
 
 	// make a first contact with the server
 	clientConnection->sendThisPlayerInfoToServer();
@@ -52,7 +51,11 @@ void GameState_Level::handleInput(sf::Time dt)
 			// reset player data
 			player->Reset();
 
+			// reset data on client connection
+			clientConnection->reset();
+
 			// go to selection again
+			gameStateMgr->addToRemoveContainer(GState::LEVEL);
 			gameStateMgr->switchTo(GState::SELECTION);
 		}
 	} 
@@ -89,24 +92,19 @@ void GameState_Level::handleInput(sf::Time dt)
 		player->SetPosition(newPos);
 		clientConnection->sendThisPlayerInfoToServer();
 	}
-	else if (input->isKeyDown(sf::Keyboard::P))
-	{
-		input->setKeyUp(sf::Keyboard::P);
-		player->AddPoint();
-	}
 }
 
 void GameState_Level::update(sf::Time dt)
 {
-	// count the time since last send message update
-	timeSinceLastUpdateRequest += dt.asSeconds();
-
+	// update player
 	player->Update(dt.asSeconds());
 
-	std::vector<TankInfo> enemiesInfo = clientConnection->getEnemiesInfos();
-	
-	if (!enemiesInfo.empty())
-		enemiesMgr->setEnemiesInfos(enemiesInfo);
+	// check if the server has sent enemies tank infos
+	// if so then get it and update them
+	clientConnection->getEnemiesInfos(dt.asSeconds());
+
+	// update enemies
+	enemiesMgr->update(dt.asSeconds());
 }
 
 void GameState_Level::render()
@@ -128,9 +126,4 @@ void GameState_Level::render()
 
 	
 	endDraw();
-}
-
-void GameState_Level::goToGameOver()
-{	
-
 }
